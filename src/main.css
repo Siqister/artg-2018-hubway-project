@@ -1,0 +1,87 @@
+html,body,div,h1,h2,h3,h4,p,ul,li{
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+
+/* Text and color */
+body,text{
+	color:#444;
+	fill:#333;
+
+}
+
+/* Layout */
+html,body{
+	width:100%;
+	height:100%;
+	background:rgb(250,250,250);
+}
+
+.app{
+	width:100%;
+	height:100%;
+	position:relative;
+}
+	.upper{
+		height:60px;
+		border-bottom:1px solid #ccc;
+	}
+	.lower{
+		position:absolute;
+		top:60px;
+		bottom:0;
+		width:100%;
+	}
+		.main{
+			border-right:1px solid #ccc;
+		}
+			.main .module{
+				width:100%;
+				height:150px;
+			}
+.full-height{
+	height:100%;
+}
+
+/*Modules*/
+.module{
+	min-width:150px;
+	min-height:100px;
+}
+.module .anno{
+	font-size:.75em;
+	font-weight:bolder;
+}
+
+/*Histogram*/
+.histogram .bin .top{
+	fill:#aaa;
+}
+.histogram .bin .bottom{
+	fill:rgba(0,0,0,.02);
+}
+
+/*Timeline*/
+.timeline .line{
+/*	stroke:rgb(100,100,100);
+*/}
+.timeline .area{
+	fill:rgb(120,120,120);
+}
+
+/*StationNode*/
+.station-node .anno span{
+	padding:3px 4px;
+	color:white;
+}
+.station-node .anno .stn-id{
+	background:rgb(50,50,50);
+}
+.station-node .anno .stn-name{
+	background:rgb(150,150,150);
+	text-transform: uppercase;
+}
+
+
+/* Fonts */

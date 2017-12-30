@@ -61,7 +61,7 @@ const stationsModel = Model()
 		docks:d['# of Docks'],
 		lat:+d.Latitude,
 		lng:+d.Longitude,
-		name:+d.Station
+		name:d.Station
 	}));
 
 const tripsModel = Model()
