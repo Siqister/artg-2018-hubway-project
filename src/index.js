@@ -33,11 +33,6 @@ tripsModel
 	.on('fetch:success', partialApplyDispatch(globalDispatch,'tripsModel:fetch:success',null));
 
 
-//View modules
-
-
-
-
 //"Reducers"
 globalDispatch.on('stationsModel:fetch:success', data => {
 	//no-op

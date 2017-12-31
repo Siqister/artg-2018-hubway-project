@@ -1,5 +1,5 @@
 import {select, min, max} from 'd3';
-import Timeline from './Timeline';
+import Timeline from '../Timeline';
 
 export default function StationNode(_){
 
