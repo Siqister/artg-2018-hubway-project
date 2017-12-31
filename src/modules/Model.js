@@ -66,14 +66,21 @@ const stationsModel = Model()
 
 const tripsModel = Model()
 	.url('./data/hubway_trips_reduced.csv')
-	.parse(d => ({
-		duration:+d.duration,
-		t0:new Date(d.start_date),
-		t1:new Date(d.end_date),
-		station0:d.strt_statn,
-		station1:d.end_statn,
-		bike:d.bike_nr
-	}));
+	.parse(d => {
+		const t0 = new Date(d.start_date);
+		const t1 = new Date(d.end_date);
+
+		return {
+			duration:+d.duration,
+			t0,
+			t1,
+			station0:d.strt_statn,
+			station1:d.end_statn,
+			bike:d.bike_nr,
+			t0_of_day:t0.getHours() + t0.getMinutes()/60,
+			t1_of_day:t1.getHours() + t1.getMinutes()/60
+		}
+	});
 
 export default Model;
 export {stationsModel, tripsModel};

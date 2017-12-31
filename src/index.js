@@ -7,6 +7,7 @@ import {stationsModel, tripsModel} from './modules/Model';
 import durationGraph from './modules/durationGraph';
 import timelineMain from './modules/timelineMain';
 import stationList from './modules/stationList';
+import stationInput from './modules/stationInput';
 import {partialApplyDispatch} from './utils';
 
 //Global dispatch
@@ -32,10 +33,9 @@ tripsModel
 	.on('fetch:error', partialApplyDispatch(globalDispatch,'aync:error',null))
 	.on('fetch:success', partialApplyDispatch(globalDispatch,'tripsModel:fetch:success',null));
 
-
 //"Reducers"
 globalDispatch.on('stationsModel:fetch:success', data => {
-	//no-op
+	stationInput.call(null,data);
 });
 globalDispatch.on('tripsModel:fetch:success', data => {
 	durationGraph.call(null,data);

@@ -16,6 +16,12 @@ export default function StationNode(_){
 
 		//Update internal variables
 		_domain = _domain || [min(data, d => d.t0), max(data, d => d.t1)];
+
+		//Calculate the number of days in operation
+		// == overlap between _domain and [min(data, d => d.t0), max(data, d => d.t1)]
+		
+
+
 		_timeline
 			.width(_w)
 			.height(_h)

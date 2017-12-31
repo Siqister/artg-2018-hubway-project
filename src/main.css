@@ -128,15 +128,29 @@ html,body{
 }
 
 /*Search*/
-.search input{
+#station-search input{
 	width:100%;
 	font-size:40px;
 	padding:5px 25px 0;
 	background:none;
 	border:none;
 }
-.search input::placeholder{
+#station-search input::placeholder{
 	color:rgb(0,50,200);
+}
+
+.typeahead{
+	position:absolute;
+	top:60px;
+	bottom:0;
+	width:100%;
+	background:white;
+	color:rgb(0,50,255);
+	padding:10px 25px;
+}
+
+.typeahead li{
+	font-size:40px;
 }
 
 
