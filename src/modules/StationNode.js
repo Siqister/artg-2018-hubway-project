@@ -19,7 +19,7 @@ export default function StationNode(_){
 		_timeline
 			.width(_w)
 			.height(_h)
-			.margin({t:30,b:10})
+			.margin({t:10,b:10,l:20})
 			.domain(_domain)
 			.range([0,100])
 			.value(d => d.t0);

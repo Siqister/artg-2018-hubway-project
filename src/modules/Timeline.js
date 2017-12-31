@@ -9,6 +9,7 @@ export default function Timeline(_){
 	let _domain = [new Date(2013,0,1), new Date(2018,0,1)]; //[x0, x1]
 	let _range; //[y0, y1]
 	let _interval = timeWeek; 
+	let _ticks = 3;
 	let _thresholds = _interval.range(_domain[0],_domain[1],1); //function or array
 
 	const _histogram = histogram()
@@ -51,7 +52,7 @@ export default function Timeline(_){
 		const axisYGenerator = axisLeft()
 			.tickSize(-w)
 			.scale(_scaleY)
-			.ticks(4);
+			.ticks(_ticks);
 
 		//Generate DOM
 		select(rootDom)
@@ -63,6 +64,8 @@ export default function Timeline(_){
 		lineComponent.enter().append('path')
 			.attr('class','line')
 			.merge(lineComponent)
+			.transition()
+			.duration(1000)
 			.attr('d',lineGenerator)
 			.style('fill','none');
 		const areaComponent = select(rootDom)
@@ -71,7 +74,19 @@ export default function Timeline(_){
 		areaComponent.enter().append('path')
 			.attr('class','area')
 			.merge(areaComponent)
+			.transition()
+			.duration(1000)
 			.attr('d',areaGenerator);
+		const axisYComponent = select(rootDom)
+			.selectAll('.axis-y')
+			.data([1]);
+		axisYComponent
+			.enter()
+			.append('g')
+			.attr('class','axis axis-y')
+			.merge(axisYComponent)
+			.transition()
+			.call(axisYGenerator);
 
 	}
 
@@ -109,6 +124,12 @@ export default function Timeline(_){
 	exports.range = function(_){
 		if(typeof(_)==='undefined') return _range;
 		_range = _;
+		return this;
+	}
+
+	exports.ticks = function(_){
+		if(typeof(_)==='undefined') return _ticks;
+		_ticks = _;
 		return this;
 	}
 

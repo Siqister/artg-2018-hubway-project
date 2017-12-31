@@ -3,19 +3,22 @@ html,body,div,h1,h2,h3,h4,p,ul,li{
 	padding:0;
 	list-style:none;
 }
+input:focus{
+	outline:none;
+}
 
 /* Text and color */
 body,text{
-	color:#444;
-	fill:#333;
-
+	color:white;
+	fill:white;
+	font-family:'Miso';
 }
 
 /* Layout */
 html,body{
 	width:100%;
 	height:100%;
-	background:rgb(250,250,250);
+	background:rgb(0,50,255);
 }
 
 .app{
@@ -25,7 +28,7 @@ html,body{
 }
 	.upper{
 		height:60px;
-		border-bottom:1px solid #ccc;
+		border-bottom:1px solid rgba(255,255,255,.3);
 	}
 	.lower{
 		position:absolute;
@@ -34,7 +37,7 @@ html,body{
 		width:100%;
 	}
 		.main{
-			border-right:1px solid #ccc;
+			border-right:1px solid rgba(255,255,255,.3);
 		}
 			.main .module{
 				width:100%;
@@ -47,7 +50,7 @@ html,body{
 /*Modules*/
 .module{
 	min-width:150px;
-	min-height:100px;
+	min-height:60px;
 }
 .module .anno{
 	font-size:.75em;
@@ -56,7 +59,7 @@ html,body{
 
 /*Histogram*/
 .histogram .bin .top{
-	fill:#aaa;
+	fill:rgba(255,255,255,.3);
 }
 .histogram .bin .bottom{
 	fill:rgba(0,0,0,.02);
@@ -67,21 +70,82 @@ html,body{
 /*	stroke:rgb(100,100,100);
 */}
 .timeline .area{
-	fill:rgb(120,120,120);
+	fill:rgba(0,0,0,.2);
+}
+.timeline .axis .tick line{
+	stroke:rgba(255,255,255,.4);
+	stroke-dasharray:2px 2px;
+}
+.timeline .axis .tick text{
+	fill:rgba(255,255,255,.4);
+}
+.timeline .axis .domain{
+	display:none;
 }
 
-/*StationNode*/
+/*stationList*/
+
+/*stationList -> stationIndex */
+#station-index{
+	width:100%;
+	height:45px;
+	line-height:45px;
+	padding:0 10px;
+	position:relative;
+}
+#station-index .page-nav{
+	position:absolute;
+	top:50%;
+	right:0;
+	transform:translate(0,-50%);
+}
+#station-index .page-nav-button{
+	width:6px;
+	height:6px;
+	margin:0 5px;
+	float:left;
+	background:white;
+	border-radius:50px;
+	cursor:pointer;
+	transition:all 200ms;
+}
+#station-index .page-nav-button:hover{
+	transform:scale(2);
+}
+
+/*stationList -> StationNode*/
 .station-node .anno span{
 	padding:3px 4px;
 	color:white;
 }
 .station-node .anno .stn-id{
-	background:rgb(50,50,50);
+	background:rgba(0,0,0,.3);
 }
 .station-node .anno .stn-name{
-	background:rgb(150,150,150);
+	background:white;
+	color:#03afeb;
 	text-transform: uppercase;
+}
+
+/*Search*/
+.search input{
+	width:100%;
+	font-size:40px;
+	padding:5px 25px 0;
+	background:none;
+	border:none;
+}
+.search input::placeholder{
+	color:rgb(0,50,200);
 }
 
 
 /* Fonts */
+@font-face{
+	font-family:Maison;
+	src:url('./fonts/MaisonNeueTRIAL-Bold.otf');
+}
+@font-face{
+	font-family:Miso;
+	src:url('./fonts/MISO-BOL.otf');
+}
