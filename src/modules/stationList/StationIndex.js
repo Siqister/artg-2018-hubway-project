@@ -34,11 +34,11 @@ export default function StationIndex(_){
 			.on('click', (d,i) => {
 				_onClickCallback(i);
 			})
-			.html('')
-			.style('background','rgb(0,50,200)')
+			.style('border','1px solid rgba(255,255,255,.3)')
+			.style('background','none')
 			.filter((d,i) => i === _currentPage)
-			.html(_currentPage)
-			.style('background','white');
+			.style('background','white')
+			.style('border','none');
 		pageNavButton.exit().remove();
 
 	}

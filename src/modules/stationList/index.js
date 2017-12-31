@@ -45,7 +45,6 @@ function StationList(dom){
 		stationIndex
 			.total(_totalStations)
 			.stationsPerPage(_numStationsPerPage)
-			.text('Top destinations:')
 			.onClick(i => {
 				_currentPage = i;
 				redraw();
@@ -57,7 +56,8 @@ function StationList(dom){
 	function redraw(){
 
 		stationIndex
-			.currentPage(_currentPage);
+			.currentPage(_currentPage)
+			.text(`Top ${_currentPage*_numStationsPerPage+1}-${Math.min(_totalStations, (_currentPage+1)*_numStationsPerPage)} destinations:`);
 
 		//Build/update DOM
 		const indexNode = select(dom)
