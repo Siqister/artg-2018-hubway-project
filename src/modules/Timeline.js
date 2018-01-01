@@ -147,7 +147,6 @@ export default function Timeline(_){
 		return this;
 	}
 
-
 	return exports;
 
 }

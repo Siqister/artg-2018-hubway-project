@@ -41,7 +41,7 @@ function TimelineModule(dom){
 		}else{
 			_svg
 				.attr('width',width)
-				.attr('height',height)
+				.attr('height',height);
 
 			_timeline
 				.width(width)

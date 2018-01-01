@@ -8,7 +8,11 @@ import durationGraph from './modules/durationGraph';
 import timelineMain from './modules/timelineMain';
 import stationList from './modules/stationList';
 import stationInput from './modules/stationInput';
+import {tripBalanceMain} from './modules/TripBalanceGraph';
 import {partialApplyDispatch} from './utils';
+
+//TODO
+import TripBalanceGraph from './modules/TripBalanceGraph';
 
 //Global dispatch
 const globalDispatch = dispatch(
@@ -44,6 +48,9 @@ globalDispatch.on('tripsModel:fetch:success', data => {
 		.then(stations => {
 			stationList.call(null,data,stations);
 		});
+
+	//TEST
+	tripBalanceMain.call(null,data.filter(d => d.station0 === '67' || d.station1 === '67'));
 });
 
 //Initial data fetch
