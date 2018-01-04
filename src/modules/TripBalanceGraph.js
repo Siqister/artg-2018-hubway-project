@@ -1,6 +1,6 @@
 import {select, scaleLinear, path} from 'd3';
 
-export function TripBalanceGraph(_){
+export default function TripBalanceGraph(_){
 
 	let _w = 500, _h = 300; //default width and height
 	let _margin = {t:30,r:30,b:30,l:30};

@@ -8,11 +8,14 @@ function StationList(dom){
 	let _nodeW = 150, _nodeH = 120;
 	let tripsData;
 	let stationsData;
-	//state related to how many station nodes to show
+	//state related to pagination
 	let _totalStations = 0;
 	let _numStationsPerPage = 0;
 	let _currentPage = 0;
 	const _groupByStopStation = nest().key(d => d.station1);
+	//state related to visualization type
+	let _stationNodeStates = ['Trip Volume','24 Hours','Departure vs. Arrival'];
+	let _currentStationNodeState = 0;
 	//Reusable modules
 	const stationNode = StationNode();
 	const stationIndex = StationIndex();
@@ -45,8 +48,12 @@ function StationList(dom){
 		stationIndex
 			.total(_totalStations)
 			.stationsPerPage(_numStationsPerPage)
-			.onClick(i => {
+			.onPagination(i => {
 				_currentPage = i;
+				redraw();
+			})
+			.onStationNodeStateChange(i => {
+				_currentStationNodeState = i;
 				redraw();
 			});
 
@@ -59,9 +66,13 @@ function StationList(dom){
 			.currentPage(_currentPage)
 			.text(`Top ${_currentPage*_numStationsPerPage+1}-${Math.min(_totalStations, (_currentPage+1)*_numStationsPerPage)} destinations:`);
 
+		stationNode
+			.mode(_stationNodeStates[_currentStationNodeState]);
+
 		//Build/update DOM
 		const indexNode = select(dom)
 			.select('#station-index')
+			.datum({_stationNodeStates, _currentStationNodeState})
 			.each(stationIndex);
 		const nodes = select(dom)
 			.selectAll('.station-node')

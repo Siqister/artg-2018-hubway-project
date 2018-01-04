@@ -113,6 +113,32 @@ html,body{
 #station-index .page-nav-button:hover{
 	transform:scale(2);
 }
+#station-index .text,
+#station-index .station-node-state{
+	float:left;
+	margin-right:10px;
+}
+	#station-index .station-node-state .station-node-state-button{
+		padding:6px 8px 5px;
+		margin:0 3px;
+		border-radius:2em;
+		border:1px solid rgba(255,255,255,.3);
+		color:rgba(255,255,255,.3);
+		transition:all 200ms;
+	}
+	#station-index .station-node-state .station-node-state-button:hover{
+		border:1px solid rgb(255,255,255);
+		color:white;
+	}
+	#station-index .station-node-state .active{
+		border:1px solid rgb(255,255,255);
+		background:white;
+		color:rgb(0,50,255);
+		text-decoration: none;
+	}
+	#station-index .station-node-state .active:hover{
+		color:rgb(0,50,255);
+	}
 
 /*stationList -> StationNode*/
 .station-node .anno span{

@@ -6,12 +6,14 @@ export default function StationIndex(_){
 	let _stationsPerPage = 1;
 	let _currentPage = 0;
 	let _text = 'All stations';
-	let _onClickCallback = () => {};
+	let _onPaginationCallback = () => {};
+	let _onStationNodeStateChange = () => {};
 
 	function exports(data){
 
 		const rootDom = _ || this;
 
+		//text component
 		const text = select(rootDom)
 			.selectAll('.text')
 			.data([_text]);
@@ -19,6 +21,31 @@ export default function StationIndex(_){
 			.attr('class','text')
 			.merge(text)
 			.text(d => d);
+
+		//stationNodeState selector
+		const stationNodeStates = select(rootDom)
+			.selectAll('.station-node-state')
+			.data([data._stationNodeStates]);
+		const stationNodeStatesEnter = stationNodeStates.enter()
+			.append('div')
+			.attr('class','station-node-state');
+		const stationNodeStatesButton = stationNodeStates.merge(stationNodeStatesEnter)
+			.selectAll('.station-node-state-button')
+			.data(d => d, (d,i) => i);
+		stationNodeStatesButton.enter()
+			.append('a')
+			.attr('class','station-node-state-button')
+			.attr('href','#')
+			.merge(stationNodeStatesButton)
+			.on('click', (d,i) => {
+				_onStationNodeStateChange(i);
+			})
+			.html(d => d)
+			.classed('active', (d,i) => i === data._currentStationNodeState);
+		stationNodeStatesButton.exit().remove();
+
+
+		//page navigation component
 		const pageNav = select(rootDom)
 			.selectAll('.page-nav')
 			.data([1]);
@@ -32,7 +59,7 @@ export default function StationIndex(_){
 			.attr('class','page-nav-button')
 			.merge(pageNavButton)
 			.on('click', (d,i) => {
-				_onClickCallback(i);
+				_onPaginationCallback(i);
 			})
 			.style('border','1px solid rgba(255,255,255,.3)')
 			.style('background','none')
@@ -67,9 +94,15 @@ export default function StationIndex(_){
 		return this;
 	}
 
-	exports.onClick = function(cb){
-		if(typeof(cb)==='undefined') return _onClickCallback;
-		_onClickCallback = cb;
+	exports.onPagination = function(cb){
+		if(typeof(cb)==='undefined') return _onPaginationCallback;
+		_onPaginationCallback = cb;
+		return this;
+	}
+
+	exports.onStationNodeStateChange = function(cb){
+		if(typeof(cb)==='undefined') return _onStationNodeStateChange;
+		_onStationNodeStateChange = cb;
 		return this;
 	}
 
