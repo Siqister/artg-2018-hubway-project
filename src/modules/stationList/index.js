@@ -32,8 +32,10 @@ function StationList(dom){
 		tripsData = _groupByStopStation.entries(data)
 			.sort((a,b) => (b.values.length - a.values.length))
 			.map(d => {
-				if(stationsMap.get(d.key)){
-					d.stationName = stationsMap.get(d.key).name;
+				const v = stationsMap.get(d.key);
+				if(v){
+					d.stationName = v.name;
+					d.code3 = v.code3;
 				}
 				return d;
 			});

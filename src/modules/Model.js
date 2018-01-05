@@ -61,7 +61,8 @@ const stationsModel = Model()
 		docks:d['# of Docks'],
 		lat:+d.Latitude,
 		lng:+d.Longitude,
-		name:d.Station
+		name:d.Station,
+		code3:d.Station?d.Station.split(' ').map(str => str[0]).slice(0,3).join(''):'N/A'
 	}));
 
 const tripsModel = Model()
