@@ -50,7 +50,7 @@ globalDispatch.on('tripsModel:fetch:success', data => {
 		});
 
 	//TEST
-	tripBalanceMain.call(null,data.filter(d => d.station0 === '67' || d.station1 === '67'));
+	tripBalanceMain.call(null,data.filter(d => d.station0 === '22' || d.station1 === '22'));
 });
 
 //Initial data fetch

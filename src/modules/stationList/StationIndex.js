@@ -1,4 +1,4 @@
-import {select} from 'd3';
+import {select, event as d3Event} from 'd3';
 
 export default function StationIndex(_){
 
@@ -38,6 +38,7 @@ export default function StationIndex(_){
 			.attr('href','#')
 			.merge(stationNodeStatesButton)
 			.on('click', (d,i) => {
+				d3Event.preventDefault();
 				_onStationNodeStateChange(i);
 			})
 			.html(d => d)
@@ -59,6 +60,7 @@ export default function StationIndex(_){
 			.attr('class','page-nav-button')
 			.merge(pageNavButton)
 			.on('click', (d,i) => {
+				d3Event.preventDefault();
 				_onPaginationCallback(i);
 			})
 			.style('border','1px solid rgba(255,255,255,.3)')

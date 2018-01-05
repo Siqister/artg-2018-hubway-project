@@ -10,7 +10,7 @@ export default function TripBalanceGraph(_){
 
 	function exports(data){
 
-		const dom = _ || this;
+		const svg = select(_||this);
 		const w = _w - _margin.l - _margin.r;
 		const h = _h - _margin.t - _margin.b;
 
@@ -25,22 +25,34 @@ export default function TripBalanceGraph(_){
 			.range([5,h/2]);
 
 		//Build/update DOM
-		const _path = select(dom)
-			.classed('trip-balance-graph',true)
+		let rootDom = svg
+			.selectAll('.trip-balance-graph')
+			.data([data]);
+		rootDom.exit().remove();
+		rootDom = rootDom.enter().append('g')
+			.call(selection => {
+				if(selection.size()>0) svg.selectAll('.viz-module').remove(); //clear any existing .viz-module that is not .trip-balance-graph
+			})
+			.merge(rootDom)
 			.attr('transform',`translate(${_margin.l}, ${_margin.t + h/2})`)
+			.attr('class','trip-balance-graph viz-module');
+
+		const _path = rootDom
 			.selectAll('path')
 			.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
 		_path.enter()
 			.append('path')
+			.style('fill','rgb(0,50,255)')
 			.merge(_path)
 			.call(drawPath);
 		//origin destination
-		const originNode = select(dom)
+		const originNode = rootDom
 			.selectAll('.origin')
 			.data([arrivals,departures]);
 		const originNodeEnter = originNode.enter()
 			.append('g').attr('class','origin');
 		originNodeEnter.append('circle')
+			.attr('r',0)
 			.style('fill','none')
 			.style('stroke','rgba(255,255,255,.5)')
 			.style('stroke-dasharray','1px 2px');

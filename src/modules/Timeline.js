@@ -20,7 +20,7 @@ export default function Timeline(_){
 
 	function exports(data){
 
-		const rootDom = _||this;
+		const svg = select(_||this);
 
 		//Update state
 		const w = _w - _margin.l - _margin.r;
@@ -55,10 +55,19 @@ export default function Timeline(_){
 			.ticks(_ticks);
 
 		//Generate DOM
-		select(rootDom)
-			.classed('timeline',true)
-			.attr('transform',`translate(${_margin.l}, ${_margin.t})`);
-		const lineComponent = select(rootDom)
+		let rootDom = svg
+			.selectAll('.timeline')
+			.data([data]);
+		rootDom.exit().remove();
+		rootDom = rootDom.enter().append('g')
+			.call(selection => {
+				if(selection.size()>0) svg.selectAll('.viz-module').remove(); //clear any existing .viz-module that is not .timeline
+			})
+			.merge(rootDom)
+			.attr('transform',`translate(${_margin.l}, ${_margin.t})`)
+			.attr('class','timeline viz-module');
+
+		const lineComponent = rootDom
 			.selectAll('.line')
 			.data([timelineData]);
 		lineComponent.enter().append('path')
@@ -68,7 +77,7 @@ export default function Timeline(_){
 			.duration(1000)
 			.attr('d',lineGenerator)
 			.style('fill','none');
-		const areaComponent = select(rootDom)
+		const areaComponent = rootDom
 			.selectAll('.area')
 			.data([timelineData]);
 		areaComponent.enter().append('path')
@@ -77,7 +86,7 @@ export default function Timeline(_){
 			.transition()
 			.duration(1000)
 			.attr('d',areaGenerator);
-		const axisYComponent = select(rootDom)
+		const axisYComponent = rootDom
 			.selectAll('.axis-y')
 			.data([1]);
 		axisYComponent
@@ -86,6 +95,7 @@ export default function Timeline(_){
 			.attr('class','axis axis-y')
 			.merge(axisYComponent)
 			.transition()
+			.duration(1000)
 			.call(axisYGenerator);
 
 	}

@@ -34,11 +34,24 @@ export default function StationNode(_){
 		_tripBalanceGraph
 			.width(_w)
 			.height(_h)
-			.margin({t:5,b:5})
+			.margin({t:0,b:10})
 			.domain([0,10000])
 			.origin(data.key);
 
 		//Build / update DOM
+		//Choose the right viz module, depending on _mode
+		let vizModule;
+		switch(_mode){
+			case 'Trip Volume':
+				vizModule = _timeline;
+				break;
+			case 'Departure vs. Arrival':
+				vizModule = _tripBalanceGraph;
+				break;
+			default:
+				vizModule = _timeline;
+		}
+
 		const vizInner = select(rootDOM)
 			.style('position','relative')
 			.selectAll('.viz-inner')
@@ -47,13 +60,11 @@ export default function StationNode(_){
 			.attr('class','viz-inner')
 			.style('position','absolute')
 			.style('bottom',0);
-		vizInnerEnter.append('g');
 		vizInnerEnter
 			.merge(vizInner)
 			.attr('width',_w)
 			.attr('height',_h)
-			.select('g')
-			.each(_timeline);
+			.each(vizModule);
 
 		const anno = select(rootDOM)
 			.selectAll('.anno')
