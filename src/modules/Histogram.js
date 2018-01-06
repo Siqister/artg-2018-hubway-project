@@ -169,7 +169,8 @@ function DurationGraph(dom){
 				.value(d => d.duration)
 				.domain([0,60*60])
 				.thresholds(range(0,60*60,5*60))
-				.parseLabel(d => `${Math.floor(d/60)}`)
+				.parseLabel(d => `${Math.floor(d/60)}`);
+			_histogram
 				.call(null,data);
 
 			const anno = select(dom)

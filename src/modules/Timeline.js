@@ -201,7 +201,8 @@ function TimelineContainer(dom){
 				.width(width)
 				.height(height)
 				.value(d => d.t0)
-				.domain([t0,t1])
+				.domain([t0,t1]);
+			_timeline
 				.call(null,data);
 
 			const anno = select(dom)

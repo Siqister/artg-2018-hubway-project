@@ -57,7 +57,12 @@ globalDispatch.on('tripsModel:fetch:success', data => {
 });
 
 globalDispatch.on('resize', () => {
-	console.log('resize');
+	tripsModel.toJSON()
+		.then(data => {
+			durationGraph.call(null,data);
+			timelineMain.call(null,data);
+			tripBalanceMain.call(null,data.filter(d => d.station0 === '22' || d.station1 === '22'));
+		});
 });
 
 //Initial data fetch
