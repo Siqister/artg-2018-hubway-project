@@ -1,4 +1,5 @@
 import {select, scaleLinear, path} from 'd3';
+import {loadingStatusSm} from './LoadingStatus';
 
 export default function TripBalanceGraph(_){
 
@@ -127,14 +128,24 @@ export default function TripBalanceGraph(_){
 
 }
 
-function TripBalanceContainer(_){
+function TripBalanceContainer(dom){
 
 	let _tripBalanceGraph;
 	let _svg;
 
+	//Add loading indicator on module initialization
+	select(dom)
+		.append('div')
+		.attr('class','loading-status')
+		.each(loadingStatusSm);
+
 	function exports(data){
 
-		const dom = _ || this;
+		//On successful data injection, remove loading status
+		select(dom)
+			.select('.loading-status')
+			.remove();
+
 		const width = dom.clientWidth;
 		const height = dom.clientHeight - 30;
 

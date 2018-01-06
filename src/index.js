@@ -4,8 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './main.css';
 
 import {stationsModel, tripsModel} from './modules/Model';
-import durationGraph from './modules/durationGraph';
-import timelineMain from './modules/timelineMain';
+import {durationGraph} from './modules/Histogram';
+import {timelineMain} from './modules/Timeline';
 import stationList from './modules/stationList';
 import stationInput from './modules/stationInput';
 import {tripBalanceMain} from './modules/TripBalanceGraph';

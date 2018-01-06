@@ -1,4 +1,5 @@
-import {select, histogram, extent, scaleLinear, max} from 'd3';
+import {select, histogram, extent, scaleLinear, max, range} from 'd3';
+import {loadingStatusSm} from './LoadingStatus';
 
 export default function Histogram(_){
 
@@ -130,3 +131,71 @@ export default function Histogram(_){
 	return exports;
 
 }
+
+function DurationGraph(dom){
+
+	let _svg;
+	let _histogram;
+
+	//Add loading indicator on module initialization
+	select(dom)
+		.append('div')
+		.attr('class','loading-status')
+		.each(loadingStatusSm);
+
+	function exports(data){
+
+		//On successful data injection, remove loading status
+		select(dom)
+			.select('.loading-status')
+			.remove();
+
+		//Recompute dom attributes
+		const width = dom.clientWidth;
+		const height = dom.clientHeight-30;
+
+		if(!_svg){
+			_svg = select(dom)
+				.style('position','relative')
+				.append('svg')
+				.style('position','absolute')
+				.style('bottom',0)
+				.attr('width',width)
+				.attr('height',height);
+
+			_histogram = Histogram(_svg.append('g').node())
+				.width(width)
+				.height(height)
+				.value(d => d.duration)
+				.domain([0,60*60])
+				.thresholds(range(0,60*60,5*60))
+				.parseLabel(d => `${Math.floor(d/60)}`)
+				.call(null,data);
+
+			const anno = select(dom)
+				.append('div')
+				.style('padding','10px 10px 0')
+				.attr('class','anno');
+			anno.append('label')
+				.html('Trip Duration');
+			anno.append('span')
+				.attr('class','pull-right')
+				.html('(min.)');
+		}else{
+			_svg
+				.attr('width',width)
+				.attr('height',height)
+
+			_histogram
+				.width(width)
+				.height(height)
+				.call(null,data);
+		}
+
+	}
+
+	return exports;
+
+}
+
+export const durationGraph = DurationGraph(document.getElementById('duration-graph-main'));

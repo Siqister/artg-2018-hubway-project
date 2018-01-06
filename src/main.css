@@ -209,6 +209,11 @@ html,body{
 	font-size:40px;
 }
 
+/* Loading status */
+.loading-status path{
+	animation:rotate 2s infinite;
+}
+
 
 /* Fonts */
 @font-face{
@@ -218,4 +223,10 @@ html,body{
 @font-face{
 	font-family:Miso;
 	src:url('./fonts/MISO-BOL.otf');
+}
+
+/*Animation key frame*/
+@keyframes rotate{
+	from {transform:rotate(0);}
+	to {transform:rotate(360deg);}
 }

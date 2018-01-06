@@ -4,14 +4,17 @@ export default function LoadingStatus(_){
 
 	let _w = 60,
 		_h = 60;
+	let _stroke = Math.floor(_w/8);
 
 	function exports(){
 
 		const rootDom = _ || this;
 
+		_stroke = Math.floor(_w/8);
+
 		const _path = path();
-		_path.moveTo(_w/2-2, 0);
-		_path.arc(0, 0, _h/2-2, 0, Math.PI,true);
+		_path.moveTo(_w/2-_stroke, 0);
+		_path.arc(0, 0, _h/2-_stroke, 0, Math.PI,true);
 
 		select(rootDom)
 			.classed('loading-status',true)
@@ -23,12 +26,13 @@ export default function LoadingStatus(_){
 			.append('svg')
 			.attr('width',_w)
 			.attr('height',_h)
-			.append('path')
+			.append('g')
 			.attr('transform',`translate(${_w/2},${_h/2})`)
+			.append('path')
 			.attr('d',_path.toString())
 			.style('fill','none')
 			.style('stroke','white')
-			.style('stroke-width','3px');
+			.style('stroke-width',`${_stroke}px`);
 
 	}
 

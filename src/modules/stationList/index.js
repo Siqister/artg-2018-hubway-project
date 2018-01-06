@@ -1,6 +1,7 @@
 import {nest, select, min, max, map} from 'd3';
 import StationNode from './StationNode';
 import StationIndex from './StationIndex';
+import {loadingStatusMd} from '../LoadingStatus';
 
 function StationList(dom){
 
@@ -20,7 +21,18 @@ function StationList(dom){
 	const stationNode = StationNode();
 	const stationIndex = StationIndex();
 
+	//Add loading indicator on module initialization
+	select(dom)
+		.append('div')
+		.attr('class','loading-status')
+		.each(loadingStatusMd);
+
 	function exports(data, stations){
+
+		//On successful data injection, remove loading status
+		select(dom)
+			.select('.loading-status')
+			.remove();
 
 		//Recompute internal variables
 		_w = dom.clientWidth;
