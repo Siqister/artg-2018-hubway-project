@@ -1,4 +1,5 @@
 import {select, min, max} from 'd3';
+import {loadingStatusSm} from './LoadingStatus';
 import Timeline from './Timeline';
 
 function TimelineModule(dom){
@@ -6,7 +7,19 @@ function TimelineModule(dom){
 	let _svg;
 	let _timeline;
 
+	//Add loading indicator on module initialization
+	select(dom)
+		.append('div')
+		.attr('class','loading-status')
+		.each(loadingStatusSm);
+
+
 	function exports(data){
+
+		//On successful data injection, remove loading status
+		select(dom)
+			.select('.loading-status')
+			.remove();
 
 		//Recompute dom attributes
 		const width = dom.clientWidth;
