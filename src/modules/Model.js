@@ -10,6 +10,7 @@ function Model(){
 		'fetch:error',
 		'fetch:end'
 	);
+	let _dataStore;
 
 	function exports(){}
 
@@ -28,7 +29,7 @@ function Model(){
 	exports.fetch = function(){
 		_dispatch.call('fetch:start');
 
-		return new Promise((resolve,reject) => {
+		_dataStore = new Promise((resolve,reject) => {
 			csv(_url, _parse, (err,data) => {
 				if(err){ reject(err); }
 				else{ resolve(data); }
@@ -42,11 +43,17 @@ function Model(){
 				_dispatch.call('fetch:error',null,Error(err));
 				_dispatch.call('fetch:end');
 		});
+
+		return _dataStore
 	}
 
 	exports.on = function(...args){
 		_dispatch.on.apply(_dispatch,args);
 		return this;
+	}
+
+	exports.toJSON = function(){
+		return _dataStore;
 	}
 
 	return exports;

@@ -20,9 +20,11 @@ const globalDispatch = dispatch(
 		'tripsModel:fetch:success',
 		'async:start',
 		'async:end',
-		'async:error'
+		'async:error',
+		'resize'
 	);
 
+window.addEventListener('resize',() => {globalDispatch.call('resize')});
 
 //Model modules
 stationsModel
@@ -41,16 +43,21 @@ tripsModel
 globalDispatch.on('stationsModel:fetch:success', data => {
 	stationInput.call(null,data);
 });
+
 globalDispatch.on('tripsModel:fetch:success', data => {
 	durationGraph.call(null,data);
 	timelineMain.call(null,data);
-	stationsModel.fetch()
+	stationsModel.toJSON()
 		.then(stations => {
 			stationList.call(null,data,stations);
 		});
 
 	//TEST
 	tripBalanceMain.call(null,data.filter(d => d.station0 === '22' || d.station1 === '22'));
+});
+
+globalDispatch.on('resize', () => {
+	console.log('resize');
 });
 
 //Initial data fetch
