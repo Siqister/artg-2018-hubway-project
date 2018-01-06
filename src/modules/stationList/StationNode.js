@@ -15,7 +15,7 @@ export default function StationNode(_){
 		const rootDOM = _ || this;
 
 		_w = rootDOM.clientWidth;
-		_h = rootDOM.clientHeight - 30;
+		_h = rootDOM.clientHeight;
 
 		//Update internal variables
 		_domain = _domain || [min(data, d => d.t0), max(data, d => d.t1)];
@@ -27,15 +27,15 @@ export default function StationNode(_){
 		_timeline
 			.width(_w)
 			.height(_h)
-			.margin({t:10,b:10,l:20})
+			.margin({t:40,b:10,l:20})
 			.domain(_domain)
 			.range([0,100])
 			.value(d => d.t0);
 		_tripBalanceGraph
 			.width(_w)
 			.height(_h)
-			.margin({t:0,b:10})
-			.domain([0,10000])
+			.margin({t:20,b:10})
+			.domain([0,15000])
 			.origin(data.key);
 
 		//Build / update DOM
