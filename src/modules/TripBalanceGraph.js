@@ -39,40 +39,42 @@ export default function TripBalanceGraph(_){
 			.attr('class','trip-balance-graph viz-module');
 
 		//3 <path> 
-		const _leftToRight = rootDom
-			.selectAll('.left-to-right')
-			.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
-		_leftToRight.enter()
-			.append('path')
-			.attr('class','left-to-right')
-			//.attr('d',mainPath)
-			.style('fill-opacity',0)
-			.style('fill','rgb(0,50,255)')
-			.merge(_leftToRight)
-			.transition()
-			.duration(1000)
-			.attr('d', sidePath.bind(null,'top'))
-			.style('fill-opacity',1)
-			.style('fill','rgb(0,0,200)');
+		// const _leftToRight = rootDom
+		// 	.selectAll('.left-to-right')
+		// 	.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
+		// _leftToRight.enter()
+		// 	.append('path')
+		// 	.attr('class','left-to-right')
+		// 	.style('fill-opacity',0)
+		// 	.style('fill','rgb(0,50,255)')
+		// 	.merge(_leftToRight)
+		// 	.transition()
+		// 	.duration(1000)
+		// 	.attr('d', sidePath.bind(null,'top'))
+		// 	.style('fill-opacity',1)
+		// 	.style('fill','rgb(0,0,200)');
 
-		const _rightToLeft = rootDom
-			.selectAll('.right-to-left')
-			.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
-		_rightToLeft.enter()
-			.append('path')
-			.attr('class','right-to-left')
-			.style('fill-opacity',0)
-			.style('fill','rgb(0,50,255)')
-			.merge(_rightToLeft)
-			.transition()
-			.duration(1000)
-			.attr('d', sidePath.bind(null,'bottom'))
-			.style('fill-opacity',.7)
-			.style('fill','white');
+		// const _rightToLeft = rootDom
+		// 	.selectAll('.right-to-left')
+		// 	.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
+		// _rightToLeft.enter()
+		// 	.append('path')
+		// 	.attr('class','right-to-left')
+		// 	.style('fill-opacity',0)
+		// 	.style('fill','rgb(0,50,255)')
+		// 	.merge(_rightToLeft)
+		// 	.transition()
+		// 	.duration(1000)
+		// 	.attr('d', sidePath.bind(null,'bottom'))
+		// 	.style('fill-opacity',.7)
+		// 	.style('fill','white');
+		const r0 = _scaleSize(arrivals),
+			r1 = _scaleSize(departures),
+			l = w - r0 - r1;
 
 		const _mainPath = rootDom
 			.selectAll('.main-path')
-			.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
+			.data([{r0, r1, l}]);
 		_mainPath.enter()
 			.append('path')
 			.attr('class','main-path')
@@ -81,8 +83,20 @@ export default function TripBalanceGraph(_){
 			.transition()
 			.duration(1000)
 			.attr('d',mainPath)
+			.style('fill','rgba(0,0,0,.1)');
+		const _arcPath = rootDom
+			.selectAll('.arc-path')
+			.data([{r0, r1, l}]);
+		_arcPath.enter()
+			.append('path')
+			.attr('class','arc-path')
+			.style('fill','rgb(0,50,255)')
+			.merge(_arcPath)
+			.transition()
+			.duration(1000)
+			.attr('d',arcPath)
 			.style('fill','rgba(0,0,0,.3)');
-		//origin destination
+		//origin destination nodes
 		const originNode = rootDom
 			.selectAll('.origin')
 			.data([arrivals,departures]);
@@ -108,49 +122,6 @@ export default function TripBalanceGraph(_){
 		originNodeMerge
 			.select('text')
 			.text(d => d);
-	}
-
-	function mainPath(datum){
-
-		const {r0, r1} = datum;
-		const l = _w - _margin.l - _margin.r - r0 - r1;
-		const angle = Math.acos(Math.abs(r1-r0)/l);
-		const p = path();
-
-		p.moveTo(r0+Math.cos(angle)*r0,0-Math.sin(angle)*r0);
-		p.arc(r0,0,r0,-angle,angle,true);
-		p.arc(l+r0,0,r1,angle,-angle,true);
-		p.closePath();
-
-		return p.toString();
-	}
-
-	function sidePath(side, datum){
-
-		const {r0, r1} = datum;
-		const w = _w - _margin.l - _margin.r;
-		const l = w - r0 - r1;
-		const center = r0 + l/2;
-		const p = path();
-
-		if(side==='top'){
-			p.moveTo(0,0);
-			p.arc(center,0,center,-Math.PI,0,false);
-			p.arc(l+r0,0,r0,0,Math.PI,false);
-			p.arc(center,0,center-r0*2,0,-Math.PI,true);
-			p.arc(r0,0,r0,0,Math.PI,false);
-			p.closePath();
-		}else{
-			p.moveTo(0,0);
-			p.arc(l+r0,0,r1,-Math.PI,0,false);
-			p.arc(center,0,w-center,0,Math.PI,false);
-			p.arc(r0,0,r1,-Math.PI,0,false);
-			p.arc(center,0,center-r0-r1,-Math.PI,0,true);
-			p.closePath();
-		}
-
-		return p.toString();
-
 	}
 
 	exports.width = function(_){
@@ -186,6 +157,64 @@ export default function TripBalanceGraph(_){
 	return exports;
 
 }
+
+//Generator function that returns <path> geometry for a straight path
+function mainPath(datum){
+
+	const {r0, r1, l} = datum;
+	const angle = Math.acos(Math.abs(r1-r0)/l);
+	const p = path();
+
+	p.moveTo(r0+Math.cos(angle)*r0,0-Math.sin(angle)*r0);
+	p.arc(r0,0,r0,-angle,angle,true);
+	p.arc(l+r0,0,r1,angle,-angle,true);
+	p.closePath();
+
+	return p.toString();
+}
+
+//Generator function that returns <path> geometry for a semi-circular path
+function arcPath(datum){
+
+	const {r0, r1, l} = datum;
+	const p = path();
+
+	p.arc(r0,0,r0,-Math.PI,0,true);
+	p.arc((l+3*r0-r1)/2,0,(l-r0-r1)/2,Math.PI,0,false);
+	p.arc(l+r0,0,r1,-Math.PI,0,true);
+	p.arc((l+r0+r1)/2,0,(l+r0+r1)/2,0,Math.PI,true);
+	p.closePath();
+
+	return p.toString();
+
+}
+
+// function sidePath(side, datum){
+
+// 	const {r0, r1} = datum;
+// 	const w = _w - _margin.l - _margin.r;
+// 	const l = w - r0 - r1;
+// 	const center = r0 + l/2;
+// 	const p = path();
+
+// 	if(side==='top'){
+// 		p.moveTo(0,0);
+// 		p.arc(center,0,center,-Math.PI,0,false);
+// 		p.arc(l+r0,0,r0,0,Math.PI,false);
+// 		p.arc(center,0,center-r0*2,0,-Math.PI,true);
+// 		p.arc(r0,0,r0,0,Math.PI,false);
+// 		p.closePath();
+// 	}else{
+// 		p.moveTo(0,0);
+// 		p.arc(l+r0,0,r1,-Math.PI,0,false);
+// 		p.arc(center,0,w-center,0,Math.PI,false);
+// 		p.arc(r0,0,r1,-Math.PI,0,false);
+// 		p.arc(center,0,center-r0-r1,-Math.PI,0,true);
+// 		p.closePath();
+// 	}
+
+// 	return p.toString();
+// }
 
 function TripBalanceContainer(dom){
 
@@ -227,6 +256,7 @@ function TripBalanceContainer(dom){
 			_tripBalanceGraph = TripBalanceGraph(_svg.node())
 				.width(width)
 				.height(height)
+				.margin({t:70,b:0})
 				.origin('22');
 			_tripBalanceGraph
 				.call(null,data);
@@ -248,4 +278,4 @@ function TripBalanceContainer(dom){
 
 const tripBalanceMain = TripBalanceContainer(document.getElementById('trip-balance-main'));
 
-export {tripBalanceMain}
+export {tripBalanceMain, mainPath}
