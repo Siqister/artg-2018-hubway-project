@@ -6,7 +6,7 @@ import './main.css';
 import {stationsModel, tripsModel} from './modules/Model';
 import {durationGraph} from './modules/Histogram';
 import {timelineMain} from './modules/Timeline';
-import stationList from './modules/stationList';
+import mainViz from './modules/mainViz';
 import stationInput from './modules/stationInput';
 import {tripBalanceMain} from './modules/TripBalanceGraph';
 import {partialApplyDispatch} from './utils';
@@ -49,7 +49,7 @@ globalDispatch.on('tripsModel:fetch:success', data => {
 	timelineMain.call(null,data);
 	stationsModel.toJSON()
 		.then(stations => {
-			stationList.call(null,data,stations);
+			mainViz.call(null,data,stations);
 		});
 
 	//TEST

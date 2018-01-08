@@ -7,6 +7,7 @@ function StationList(dom){
 
 	let _w, _h;
 	let _nodeW = 150, _nodeH = 120;
+	let _onUnmount = () => {};
 	let tripsData;
 	let stationsData;
 	//state related to pagination
@@ -21,18 +22,7 @@ function StationList(dom){
 	const stationNode = StationNode();
 	const stationIndex = StationIndex();
 
-	//Add loading indicator on module initialization
-	select(dom)
-		.append('div')
-		.attr('class','loading-status')
-		.each(loadingStatusMd);
-
 	function exports(data, stations){
-
-		//On successful data injection, remove loading status
-		select(dom)
-			.select('.loading-status')
-			.remove();
 
 		//Recompute internal variables
 		_w = dom.clientWidth;
@@ -57,7 +47,7 @@ function StationList(dom){
 			.domain([min(data, d => d.t0), max(data, d => d.t1)]);
 
 		_totalStations = tripsData.length;
-		_numStationsPerPage = Math.floor(_w/_nodeW)*Math.floor((_h-30)/_nodeH);
+		_numStationsPerPage = Math.floor(_w/_nodeW)*Math.floor((_h-60)/_nodeH);
 
 		stationIndex
 			.total(_totalStations)
@@ -84,29 +74,78 @@ function StationList(dom){
 			.mode(_stationNodeStates[_currentStationNodeState]);
 
 		//Build/update DOM
-		const indexNode = select(dom)
-			.select('#station-index')
-			.datum({_stationNodeStates, _currentStationNodeState})
-			.each(stationIndex);
-		const nodes = select(dom)
+		let root = select(dom)
+			.selectAll('.station-list')
+			.data([1]);
+		root = root.enter()
+			.append('div')
+			.call(selection => {
+				if(selection.size()>0) select(dom).selectAll('.module').remove();
+			})
+			.merge(root)
+			.attr('class','station-list module');
+
+		let stationIndexNode = root
+			.selectAll('.station-index')
+			.data([{_stationNodeStates, _currentStationNodeState}]);
+		stationIndexNode = stationIndexNode.enter()
+			.append('div')
+			.attr('class','station-index')
+			//.style('transform','translate(0px,-100%)')
+			.merge(stationIndexNode)
+			.each(stationIndex)
+			// .transition()
+			// .duration(1000)
+			// .style('transform','translate(0px,0%)');
+
+		let stationNodes = root
 			.selectAll('.station-node')
 			.data(tripsData.slice(_currentPage*_numStationsPerPage, (_currentPage+1)*_numStationsPerPage));
-		nodes.enter()
+		stationNodes.exit().remove();
+		stationNodes = stationNodes.enter()
 			.append('div')
 			.attr('class','station-node module')
-			.merge(nodes)
+			.merge(stationNodes)
 			.style('width', `${_nodeW}px`)
 			.style('height', `${_nodeH}px`)
 			.style('float', 'left')
 			.each(stationNode);
-		nodes.exit().remove();
 
+		let unmountButton = root
+			.selectAll('.unmount')
+			.data([1]);
+		unmountButton = unmountButton.enter()
+			.append('a')
+			.attr('href','#')
+			.attr('class','unmount hubway-button')
+			.merge(unmountButton)
+			.html('Graph view')
+			.on('click', () => {
+				//Preparation before unmount
+				stationIndexNode
+					.transition()
+					.duration(200)
+					.style('transform','translate(0,-300%)')
+					.style('opacity',0);
+				stationNodes
+					.transition()
+					.duration(200)
+					.style('opacity',0)
+					.on('end', _onUnmount);
+			});
+
+	}
+
+	exports.onUnmount = function(fn){
+		if(typeof(fn) === 'undefined') return _onUnmount;
+		_onUnmount = fn;
+		return this;
 	}
 
 	return exports;
 
 }
 
-export default StationList(document.getElementById('station-list'));
+export default StationList;
 
 

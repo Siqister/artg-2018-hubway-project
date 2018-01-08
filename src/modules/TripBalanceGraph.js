@@ -68,7 +68,7 @@ export default function TripBalanceGraph(_){
 			.duration(1000)
 			.attr('d', sidePath.bind(null,'bottom'))
 			.style('fill-opacity',.7)
-			.style('fill','rgb(255,0,0)');
+			.style('fill','white');
 
 		const _mainPath = rootDom
 			.selectAll('.main-path')

@@ -30,11 +30,11 @@ export default function StationIndex(_){
 			.append('div')
 			.attr('class','station-node-state');
 		const stationNodeStatesButton = stationNodeStates.merge(stationNodeStatesEnter)
-			.selectAll('.station-node-state-button')
+			.selectAll('.hubway-button')
 			.data(d => d, (d,i) => i);
 		stationNodeStatesButton.enter()
 			.append('a')
-			.attr('class','station-node-state-button')
+			.attr('class','hubway-button')
 			.attr('href','#')
 			.merge(stationNodeStatesButton)
 			.on('click', (d,i) => {

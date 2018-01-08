@@ -36,13 +36,17 @@ html,body{
 		bottom:0;
 		width:100%;
 	}
-		.main{
+		.side-bar{
 			border-right:1px solid rgba(255,255,255,.3);
 		}
-			.main .module{
+			.side-bar .module{
 				width:100%;
 				height:150px;
 			}
+		.main .module{
+			width:100%;
+			height:100%;
+		}
 .full-height{
 	height:100%;
 }
@@ -94,10 +98,26 @@ html,body{
 	text-transform: uppercase;
 }
 
-/*stationList*/
+/* mainViz */
+.main .unmount{
+	border:none;
+	border-radius:.75em;
+	background:rgba(0,0,0,.05);
+	position:absolute;
+	width:100%;
+	bottom:20px;
+	left:0;
+	text-align:center;
+}
+.main .unmount:hover{
+	border:none;
+	background:rgba(0,0,200,1);
+}
 
-/*stationList -> stationIndex */
-#station-index{
+/* stationList */
+
+/* stationList -> stationIndex */
+.station-index{
 	width:100%;
 	height:45px;
 	line-height:45px;
@@ -105,13 +125,13 @@ html,body{
 	position:relative;
 	border-bottom:1px solid rgba(255,255,255,.3);
 }
-#station-index .page-nav{
+.station-index .page-nav{
 	position:absolute;
 	top:50%;
 	right:0;
 	transform:translate(0,-50%);
 }
-#station-index .page-nav-button{
+.station-index .page-nav-button{
 	width:6px;
 	height:6px;
 	margin:0 5px;
@@ -121,35 +141,14 @@ html,body{
 	cursor:pointer;
 	transition:all 200ms;
 }
-#station-index .page-nav-button:hover{
+.station-index .page-nav-button:hover{
 	transform:scale(2);
 }
-#station-index .text,
-#station-index .station-node-state{
+.station-index .text,
+.station-index .station-node-state{
 	float:left;
 	margin-right:10px;
 }
-	#station-index .station-node-state .station-node-state-button{
-		padding:6px 8px 5px;
-		margin:0 3px;
-		border-radius:2em;
-		border:1px solid rgba(255,255,255,.3);
-		color:rgba(255,255,255,.3);
-		transition:all 200ms;
-	}
-	#station-index .station-node-state .station-node-state-button:hover{
-		border:1px solid rgb(255,255,255);
-		color:white;
-	}
-	#station-index .station-node-state .active{
-		border:1px solid rgb(255,255,255);
-		background:white;
-		color:rgb(0,50,255);
-		text-decoration: none;
-	}
-	#station-index .station-node-state .active:hover{
-		color:rgb(0,50,255);
-	}
 
 /*stationList -> StationNode*/
 .station-node .anno span{
@@ -176,7 +175,6 @@ html,body{
 	width:60px;
 	height:100%;
 }
-
 #station-search input{
 	width:100%;
 	height:100%;
@@ -213,6 +211,30 @@ html,body{
 .loading-status path{
 	animation:rotate 2s infinite;
 }
+
+/* Global UI */
+.hubway-button{
+	padding:6px 8px 5px;
+	margin:0 3px;
+	border-radius:2em;
+	border:1px solid rgba(255,255,255,.3);
+	color:rgba(255,255,255,.3);
+	transition:all 200ms;
+}
+.hubway-button:hover{
+	border:1px solid rgb(255,255,255);
+	color:white;
+}
+.hubway-button.active{
+	border:1px solid rgb(255,255,255);
+	background:white;
+	color:rgb(0,50,255);
+	text-decoration: none;
+}
+.hubway-button.active:hover{
+	color:rgb(0,50,255);
+}
+
 
 
 /* Fonts */

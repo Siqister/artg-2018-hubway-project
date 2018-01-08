@@ -68,25 +68,27 @@ export default function Timeline(_){
 			.attr('transform',`translate(${_margin.l}, ${_margin.t})`)
 			.attr('class','timeline viz-module');
 
-		const lineComponent = rootDom
-			.selectAll('.line')
-			.data([timelineData]);
-		lineComponent.enter().append('path')
-			.attr('class','line')
-			.merge(lineComponent)
-			.transition()
-			.duration(1000)
-			.attr('d',lineGenerator)
-			.style('fill','none');
+		// const lineComponent = rootDom
+		// 	.selectAll('.line')
+		// 	.data([timelineData]);
+		// lineComponent.enter().append('path')
+		// 	.attr('class','line')
+		// 	.merge(lineComponent)
+		// 	.transition()
+		// 	.duration(1000)
+		// 	.attr('d',lineGenerator)
+		// 	.style('fill','none');
 		const areaComponent = rootDom
 			.selectAll('.area')
 			.data([timelineData]);
 		areaComponent.enter().append('path')
 			.attr('class','area')
+			.style('opacity',0)
 			.merge(areaComponent)
 			.transition()
+			.attr('d',areaGenerator)
 			.duration(1000)
-			.attr('d',areaGenerator);
+			.style('opacity',1);
 		const axisYComponent = rootDom
 			.selectAll('.axis-y')
 			.data([1]);
