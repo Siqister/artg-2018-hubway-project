@@ -47,7 +47,7 @@ function StationList(dom){
 			.domain([min(data, d => d.t0), max(data, d => d.t1)]);
 
 		_totalStations = tripsData.length;
-		_numStationsPerPage = Math.floor(_w/_nodeW)*Math.floor((_h-60)/_nodeH);
+		_numStationsPerPage = Math.floor(_w/_nodeW)*Math.floor((_h-90)/_nodeH);
 
 		stationIndex
 			.total(_totalStations)
@@ -126,12 +126,12 @@ function StationList(dom){
 					.transition()
 					.duration(200)
 					.style('transform','translate(0,-300%)')
-					.style('opacity',0);
+					.style('opacity',0)
+					.on('end', _onUnmount);
 				stationNodes
 					.transition()
 					.duration(200)
-					.style('opacity',0)
-					.on('end', _onUnmount);
+					.style('opacity',0);
 			});
 
 	}

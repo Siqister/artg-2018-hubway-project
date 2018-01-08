@@ -1,4 +1,4 @@
-import {nest, select, min, max, map} from 'd3';
+import {nest, select, min, max, geoMercator} from 'd3';
 
 function StationGraph(dom){
 
@@ -7,11 +7,18 @@ function StationGraph(dom){
 	let tripsData;
 	let stationsData;
 
+	//Projection
+	const projection = geoMercator()
+		.scale(180000)
+		.center([-71.081543, 42.348560]);
+
 	function exports(data, stations){
 
 		//Recompute internal variables
 		_w = dom.clientWidth;
 		_h = dom.clientHeight;
+
+		projection.translate([_w/2, _h/2]);
 
 		redraw();
 	}
@@ -30,11 +37,10 @@ function StationGraph(dom){
 			.merge(root)
 			.attr('class','station-graph module');
 
-		// root
-		// 	.style('background','blue')
-		// 	.transition()
-		// 	.style('background','red');
+		//Build/update visualization layers
+		
 
+		//Unmount button
 		let unmountButton = root
 			.selectAll('.unmount')
 			.data([1]);
