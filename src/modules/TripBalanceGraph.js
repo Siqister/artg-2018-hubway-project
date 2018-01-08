@@ -224,7 +224,7 @@ function TripBalanceContainer(dom){
 			anno.append('label')
 				.html('Departure vs. Arrival at Station');
 
-			_tripBalanceGraph = TripBalanceGraph(_svg.append('g').node())
+			_tripBalanceGraph = TripBalanceGraph(_svg.node())
 				.width(width)
 				.height(height)
 				.origin('22');

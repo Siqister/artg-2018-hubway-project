@@ -163,7 +163,7 @@ function DurationGraph(dom){
 				.attr('width',width)
 				.attr('height',height);
 
-			_histogram = Histogram(_svg.append('g').node())
+			_histogram = Histogram(_svg.node())
 				.width(width)
 				.height(height)
 				.value(d => d.duration)

@@ -31,13 +31,11 @@ export default function Timeline(_){
 			.value(_value)
 			.domain(_domain)
 			.thresholds(_thresholds);
-		const bins = _histogram(data);
+		const timelineData = _histogram(data);
 		_scaleX.domain(_domain)
 			.range([0,w]);
-		_scaleY.domain(_range || [0, max(bins, d => d.length)])
+		_scaleY.domain(_range || [0, max(timelineData, d => d.length)])
 			.range([h,0]);
-
-		const timelineData = _histogram(data);
 
 		//Generators
 		const lineGenerator = line()
@@ -86,8 +84,8 @@ export default function Timeline(_){
 			.style('opacity',0)
 			.merge(areaComponent)
 			.transition()
+			.duration(500)
 			.attr('d',areaGenerator)
-			.duration(1000)
 			.style('opacity',1);
 		const axisYComponent = rootDom
 			.selectAll('.axis-y')
@@ -199,7 +197,7 @@ function TimelineContainer(dom){
 				.attr('width',width)
 				.attr('height',height);
 
-			_timeline = Timeline(_svg.append('g').node())
+			_timeline = Timeline(_svg.node())
 				.width(width)
 				.height(height)
 				.value(d => d.t0)
