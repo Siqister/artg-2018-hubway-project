@@ -38,36 +38,6 @@ export default function TripBalanceGraph(_){
 			.attr('transform',`translate(${_margin.l}, ${_margin.t + h/2})`)
 			.attr('class','trip-balance-graph viz-module');
 
-		//3 <path> 
-		// const _leftToRight = rootDom
-		// 	.selectAll('.left-to-right')
-		// 	.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
-		// _leftToRight.enter()
-		// 	.append('path')
-		// 	.attr('class','left-to-right')
-		// 	.style('fill-opacity',0)
-		// 	.style('fill','rgb(0,50,255)')
-		// 	.merge(_leftToRight)
-		// 	.transition()
-		// 	.duration(1000)
-		// 	.attr('d', sidePath.bind(null,'top'))
-		// 	.style('fill-opacity',1)
-		// 	.style('fill','rgb(0,0,200)');
-
-		// const _rightToLeft = rootDom
-		// 	.selectAll('.right-to-left')
-		// 	.data([{r0:_scaleSize(arrivals), r1:_scaleSize(departures)}]);
-		// _rightToLeft.enter()
-		// 	.append('path')
-		// 	.attr('class','right-to-left')
-		// 	.style('fill-opacity',0)
-		// 	.style('fill','rgb(0,50,255)')
-		// 	.merge(_rightToLeft)
-		// 	.transition()
-		// 	.duration(1000)
-		// 	.attr('d', sidePath.bind(null,'bottom'))
-		// 	.style('fill-opacity',.7)
-		// 	.style('fill','white');
 		const r0 = _scaleSize(arrivals),
 			r1 = _scaleSize(departures),
 			l = w - r0 - r1;
@@ -189,33 +159,6 @@ function arcPath(datum){
 
 }
 
-// function sidePath(side, datum){
-
-// 	const {r0, r1} = datum;
-// 	const w = _w - _margin.l - _margin.r;
-// 	const l = w - r0 - r1;
-// 	const center = r0 + l/2;
-// 	const p = path();
-
-// 	if(side==='top'){
-// 		p.moveTo(0,0);
-// 		p.arc(center,0,center,-Math.PI,0,false);
-// 		p.arc(l+r0,0,r0,0,Math.PI,false);
-// 		p.arc(center,0,center-r0*2,0,-Math.PI,true);
-// 		p.arc(r0,0,r0,0,Math.PI,false);
-// 		p.closePath();
-// 	}else{
-// 		p.moveTo(0,0);
-// 		p.arc(l+r0,0,r1,-Math.PI,0,false);
-// 		p.arc(center,0,w-center,0,Math.PI,false);
-// 		p.arc(r0,0,r1,-Math.PI,0,false);
-// 		p.arc(center,0,center-r0-r1,-Math.PI,0,true);
-// 		p.closePath();
-// 	}
-
-// 	return p.toString();
-// }
-
 function TripBalanceContainer(dom){
 
 	let _tripBalanceGraph;
@@ -256,7 +199,7 @@ function TripBalanceContainer(dom){
 			_tripBalanceGraph = TripBalanceGraph(_svg.node())
 				.width(width)
 				.height(height)
-				.margin({t:70,b:0})
+				.margin({t:70,b:0,l:80,r:80})
 				.origin('22');
 			_tripBalanceGraph
 				.call(null,data);
@@ -278,4 +221,4 @@ function TripBalanceContainer(dom){
 
 const tripBalanceMain = TripBalanceContainer(document.getElementById('trip-balance-main'));
 
-export {tripBalanceMain, mainPath}
+export {tripBalanceMain, mainPath, arcPath}
