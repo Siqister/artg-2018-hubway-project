@@ -239,6 +239,13 @@ html,body{
 	font-size:40px;
 }
 
+/* stationGraph */
+.station-graph svg text{
+	fill:rgb(0,0,225);
+	font-size:.75em;
+}
+
+
 /* Loading status */
 .loading-status path{
 	animation:rotate 2s infinite;

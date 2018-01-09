@@ -15,6 +15,8 @@ function StationGraph(dom){
 	let svg;
 	let canvas;
 	let ctx;
+	let stationLinks;
+	let stationNodes;
 	//Projection
 	const projection = geoMercator()
 		.scale(180000)
@@ -112,16 +114,33 @@ function StationGraph(dom){
 		svg = root
 			.selectAll('.viz-layer-svg')
 			.data([1]);
-		svg = svg.enter()
+		const svgEnter = svg.enter()
 			.append('svg')
-			.attr('class','viz-layer-svg')
-			.merge(svg)
+			.attr('class','viz-layer-svg');
+		svg = svgEnter.merge(svg)
 			.attr('width',_w)
 			.attr('height',_h)
 			.style('position','absolute')
 			.style('top',0)
 			.style('left',0)
 			.call(renderStations);
+		//Gradient def
+		const gradient = svgEnter.append('defs')
+			.append('linearGradient')
+			.attr('id','grad1')
+			.attr('x1','0%')
+			.attr('y1','0%')
+			.attr('x2','100%')
+			.attr('y2','0%');
+		gradient.append('stop')
+			.attr('offset','0%')
+			.attr('style','stop-color:rgba(255,255,255,0)')
+		gradient.append('stop')
+			.attr('offset','20%')
+			.attr('style','stop-color:rgba(255,255,255,0)')
+		gradient.append('stop')
+			.attr('offset','100%')
+			.attr('style','stop-color:rgba(255,255,255,.2)');
 
 		//Unmount button
 		let unmountButton = root
@@ -139,28 +158,41 @@ function StationGraph(dom){
 
 	function renderStations(_){
 
-		let stationLinks = _.selectAll('.link')
+		stationLinks = _.selectAll('.station-link')
 			.data(stationsData, d => d.id_short);
 		stationLinks = stationLinks.enter()
 			.append('path')
-			.attr('class','link')
+			.attr('class','station-link')
+			.style('fill','url(#grad1)')
 			.merge(stationLinks)
-			.style('fill','rgba(255,255,255,.1)');
+			.call(renderHighlight, highlightStation);
 
-		let stationNodes = _.selectAll('.station')
+		stationNodes = _.selectAll('.station-node')
 			.data(stationsData, d => d.id_short);
-		stationNodes = stationNodes.enter()
-			.append('circle')
-			.attr('class','station')
-			.attr('transform', d => `translate(${_w/2},${_h/2})`)
-			.merge(stationNodes)
-			.attr('r', d => d.r1 - 2)
+		const stationNodesEnter = stationNodes.enter()
+			.append('g')
+			.attr('class','station-node')
+			.attr('transform', d => `translate(${_w/2},${_h/2})`);
+		stationNodesEnter.append('circle').attr('r',0);
+		stationNodesEnter.append('text').attr('text-anchor','middle').attr('dy',4)
+		stationNodes = stationNodesEnter.merge(stationNodes)
 			.on('mouseenter',d => {
 				highlightStation = d.id_short;
+				stationLinks.call(renderHighlight, highlightStation);
 			})
 			.on('mouseleave',d => {
 				highlightStation = undefined;
+				stationLinks.call(renderHighlight, highlightStation);
 			});
+		stationNodes
+			.select('circle')
+			.transition()
+			.attr('r', d => d.r1 - 2);
+		stationNodes
+			.select('text')
+			.text('')
+			.filter(d => d.r1 > 15)
+			.text(d => `${d.code3}`);
 
 		force
 			.on('tick', () => {
@@ -185,6 +217,15 @@ function StationGraph(dom){
 			.on('end', () => {})
 			.nodes(stationsData)
 			.restart();
+	}
+
+	function renderHighlight(_links,id){
+
+		_links
+			.style('fill','url(#grad1)')
+			.filter(d => d.id_short === id)
+			.style('fill','rgba(0,0,200,.9)');
+
 	}
 
 	function renderLinks(){
