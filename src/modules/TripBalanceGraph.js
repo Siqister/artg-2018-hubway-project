@@ -154,7 +154,6 @@ const ArcPath = ctx => {
 
 		const {r0, r1, l} = datum;
 
-		ctx.moveTo(0,0);
 		ctx.arc(0,0,r0,-Math.PI,0,true);
 		ctx.arc((l+r0-r1)/2,0,(l-r0-r1)/2,Math.PI,0,false);
 		ctx.arc(l,0,r1,-Math.PI,0,true);

@@ -244,6 +244,17 @@ html,body{
 	fill:rgb(0,0,225);
 	font-size:.75em;
 }
+.station-graph svg .station-node{
+	cursor:pointer;
+}
+	.station-graph svg .station-node circle{
+		fill-opacity:.8;
+	}
+	.station-graph svg .station-node:hover circle{
+		fill-opacity:1;
+	}
+
+
 
 
 /* Loading status */
