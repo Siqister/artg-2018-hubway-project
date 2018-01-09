@@ -50,9 +50,10 @@ export default function TripBalanceGraph(_){
 			.attr('class','main-path')
 			.style('fill','rgb(0,50,255)')
 			.merge(_mainPath)
+			.attr('transform',`translate(${r0},0)`)
 			.transition()
 			.duration(1000)
-			.attr('d',mainPath)
+			.attr('d', datum => MainPath(path())(datum).toString())
 			.style('fill','rgba(0,0,0,.1)');
 		const _arcPath = rootDom
 			.selectAll('.arc-path')
@@ -62,9 +63,10 @@ export default function TripBalanceGraph(_){
 			.attr('class','arc-path')
 			.style('fill','rgb(0,50,255)')
 			.merge(_arcPath)
+			.attr('transform',`translate(${r0},0)`)
 			.transition()
 			.duration(1000)
-			.attr('d',arcPath)
+			.attr('d', datum => ArcPath(path())(datum).toString())
 			.style('fill','rgba(0,0,0,.3)');
 		//origin destination nodes
 		const originNode = rootDom
@@ -129,33 +131,39 @@ export default function TripBalanceGraph(_){
 }
 
 //Generator function that returns <path> geometry for a straight path
-function mainPath(datum){
+//Can generate either <svg> attr or <canvas> context2D path commands, depending on the ctx parameter passed
+const MainPath = ctx => {
 
-	const {r0, r1, l} = datum;
-	const angle = Math.acos(Math.abs(r1-r0)/l);
-	const p = path();
+	return datum => {
+		const {r0, r1, l} = datum;
+		const angle = Math.acos(Math.abs(r1-r0)/l);
 
-	p.moveTo(r0+Math.cos(angle)*r0,0-Math.sin(angle)*r0);
-	p.arc(r0,0,r0,-angle,angle,true);
-	p.arc(l+r0,0,r1,angle,-angle,true);
-	p.closePath();
+		ctx.moveTo(Math.cos(angle)*r0,0-Math.sin(angle)*r0);
+		ctx.arc(0,0,r0,-angle,angle,true);
+		ctx.arc(l,0,r1,angle,-angle,true);
+		ctx.closePath();
 
-	return p.toString();
+		return ctx;
+	}
+
 }
-
 //Generator function that returns <path> geometry for a semi-circular path
-function arcPath(datum){
+const ArcPath = ctx => {
 
-	const {r0, r1, l} = datum;
-	const p = path();
+	return datum => {
 
-	p.arc(r0,0,r0,-Math.PI,0,true);
-	p.arc((l+3*r0-r1)/2,0,(l-r0-r1)/2,Math.PI,0,false);
-	p.arc(l+r0,0,r1,-Math.PI,0,true);
-	p.arc((l+r0+r1)/2,0,(l+r0+r1)/2,0,Math.PI,true);
-	p.closePath();
+		const {r0, r1, l} = datum;
 
-	return p.toString();
+		ctx.moveTo(0,0);
+		ctx.arc(0,0,r0,-Math.PI,0,true);
+		ctx.arc((l+r0-r1)/2,0,(l-r0-r1)/2,Math.PI,0,false);
+		ctx.arc(l,0,r1,-Math.PI,0,true);
+		ctx.arc((l-r0+r1)/2,0,(l+r0+r1)/2,0,Math.PI,true);
+		ctx.closePath();
+
+		return ctx;
+
+	}
 
 }
 
@@ -221,4 +229,4 @@ function TripBalanceContainer(dom){
 
 const tripBalanceMain = TripBalanceContainer(document.getElementById('trip-balance-main'));
 
-export {tripBalanceMain, mainPath, arcPath}
+export {tripBalanceMain, MainPath, ArcPath}
