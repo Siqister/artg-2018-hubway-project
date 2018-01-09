@@ -144,7 +144,8 @@ function StationGraph(dom){
 		stationLinks = stationLinks.enter()
 			.append('path')
 			.attr('class','link')
-			.merge(stationLinks);
+			.merge(stationLinks)
+			.style('fill','rgba(255,255,255,.1)');
 
 		let stationNodes = _.selectAll('.station')
 			.data(stationsData, d => d.id_short);
@@ -165,36 +166,23 @@ function StationGraph(dom){
 			.on('tick', () => {
 				stationNodes
 					.attr('transform', d => `translate(${d.x},${d.y})`);
+				
 				//renderLinks();
 
 				stationLinks
 					.attr('transform', d => {
 						const {x,y} = d;
-						const angle = Math.atan((y-_h/2)/(x-_w/2))*180/Math.PI;
-						return `translate(${_w/2},${_h/2})rotate(${angle})`;
-					})
-					.attr('d', (d,i) => {
-						const {x,y,r0,r1} = d;
-						const l = Math.sqrt( (x-_w/2)*(x-_w/2) + (y-_h/2)*(y-_h/2) );
-						return i%3===0?ArcPath(path())({r0,r1,l}).toString():MainPath(path())({r0,r1,l}).toString();
-					})
-					.style('fill','rgba(0,0,255,.5)');
-
-			})
-			.on('end', () => {
-				stationLinks
-					.attr('transform', d => {
-						const {x,y} = d;
-						const angle = Math.atan((y-_h/2)/(x-_w/2))*180/Math.PI;
+						const angle = Math.atan2((y-_h/2),(x-_w/2))*180/Math.PI;
 						return `translate(${_w/2},${_h/2})rotate(${angle})`;
 					})
 					.attr('d', (d,i) => {
 						const {x,y,r0,r1} = d;
 						const l = Math.sqrt( (x-_w/2)*(x-_w/2) + (y-_h/2)*(y-_h/2) );
 						return i%5===0?ArcPath(path())({r0,r1,l}).toString():MainPath(path())({r0,r1,l}).toString();
-					})
-					.style('fill','rgba(0,0,255,.5)');
+					});
+
 			})
+			.on('end', () => {})
 			.nodes(stationsData)
 			.restart();
 	}
