@@ -1,4 +1,4 @@
-import {nest, select, min, max, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path} from 'd3';
+import {nest, select, map, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path} from 'd3';
 import {MainPath, ArcPath} from '../TripBalanceGraph';
 
 function StationGraph(dom){
@@ -107,9 +107,6 @@ function StationGraph(dom){
 			.style('top',0)
 			.style('left',0);
 		ctx = canvas.node().getContext('2d');
-		//Instantiate path generator function with the correct ctx
-		arcPath = ArcPath(ctx);
-		mainPath = MainPath(ctx);
 
 		svg = root
 			.selectAll('.viz-layer-svg')
@@ -165,7 +162,7 @@ function StationGraph(dom){
 			.attr('class','station-link')
 			.style('fill','url(#grad1)')
 			.merge(stationLinks)
-			.call(renderHighlight, highlightStation);
+			.call(renderLinks, highlightStation);
 
 		stationNodes = _.selectAll('.station-node')
 			.data(stationsData, d => d.id_short);
@@ -178,11 +175,11 @@ function StationGraph(dom){
 		stationNodes = stationNodesEnter.merge(stationNodes)
 			.on('mouseenter',d => {
 				highlightStation = d.id_short;
-				stationLinks.call(renderHighlight, highlightStation);
+				stationLinks.call(renderLinks, highlightStation);
 			})
 			.on('mouseleave',d => {
 				highlightStation = undefined;
-				stationLinks.call(renderHighlight, highlightStation);
+				stationLinks.call(renderLinks, highlightStation);
 			});
 		stationNodes
 			.select('circle')
@@ -199,8 +196,6 @@ function StationGraph(dom){
 				stationNodes
 					.attr('transform', d => `translate(${d.x},${d.y})`);
 				
-				//renderLinks();
-
 				stationLinks
 					.attr('transform', d => {
 						const {x,y} = d;
@@ -214,38 +209,32 @@ function StationGraph(dom){
 					});
 
 			})
-			.on('end', () => {})
+			.on('end', () => {
+
+				//layout is stabilized
+				//Render trips
+				renderTrips();
+
+			})
 			.nodes(stationsData)
 			.restart();
 	}
 
-	function renderHighlight(_links,id){
+	function renderLinks(_links, _highlight){
 
 		_links
 			.style('fill','url(#grad1)')
-			.filter(d => d.id_short === id)
-			.style('fill','rgba(0,0,200,.9)');
+			.filter(d => d.id_short === _highlight)
+			.style('fill','#00ff80');
 
 	}
 
-	function renderLinks(){
+	function renderTrips(){
 
 		ctx.clearRect(0, 0, _w, _h);
-		ctx.fillStyle = 'rgba(0,0,0,.05)';
+		ctx.fillStyle = 'rgba(0,0,0,.5)';
 
-		stationsData.forEach((s,i) => {
-			if(i%10 > 0) return;
-			const {x,y,r0,r1} = s;
-			const l = Math.sqrt( (x-_w/2)*(x-_w/2) + (y-_h/2)*(y-_h/2) );
-			const angle = Math.atan((y-_h/2)/(x-_w/2)); //in radian
-
-			ctx.translate(_w/2, _h/2);
-			ctx.rotate(angle);
-			arcPath({r0,r1,l});
-			ctx.resetTransform();
-		});
-
-		ctx.fill();
+		requestAnimationFrame(renderTrips);
 
 	}
 

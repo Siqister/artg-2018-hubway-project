@@ -47,6 +47,7 @@ html,body{
 .main{
 	grid-area:main;
 	padding:0 15px;
+	position:relative;
 }
 	.main .module{
 		width:100%;
