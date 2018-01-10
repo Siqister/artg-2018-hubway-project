@@ -1,5 +1,6 @@
-import {nest, select, map, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path} from 'd3';
+import {nest, select, map, min, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path} from 'd3';
 import {MainPath, ArcPath} from '../TripBalanceGraph';
+const crossfilter = require('crossfilter');
 
 function StationGraph(dom){
 
@@ -14,9 +15,12 @@ function StationGraph(dom){
 	//Reference to internal nodes
 	let svg;
 	let canvas;
+	let canvasOffScreen;
 	let ctx;
+	let ctxOffScreen;
 	let stationLinks;
 	let stationNodes;
+	let locationLookup = new Map();
 	//Projection
 	const projection = geoMercator()
 		.scale(180000)
@@ -31,6 +35,12 @@ function StationGraph(dom){
 	const radial = forceRadial();
 	//Path generator functions
 	let arcPath, mainPath;
+
+	//Animation related
+	let cf;
+	let t0;
+	let t1;
+	let t;
 
 	function exports(data, stations){
 
@@ -64,6 +74,9 @@ function StationGraph(dom){
 				x,
 				y
 			}
+		});
+		stationsData.forEach(s => {
+			locationLookup.set(s.id_short,s);
 		});
 
 		//Update forces
@@ -105,14 +118,22 @@ function StationGraph(dom){
 			.attr('height',_h)
 			.style('position','absolute')
 			.style('top',0)
-			.style('left',0);
+			.style('left',0)
+			.style('pointer-events','none');
 		ctx = canvas.node().getContext('2d');
+
+		if(!canvasOffScreen){
+			canvasOffScreen = document.createElement('canvas');
+			ctxOffScreen = canvasOffScreen.getContext('2d');
+		}
+		canvasOffScreen.width = _w;
+		canvasOffScreen.height = _h;
 
 		svg = root
 			.selectAll('.viz-layer-svg')
 			.data([1]);
 		const svgEnter = svg.enter()
-			.append('svg')
+			.insert('svg','.viz-layer-canvas')
 			.attr('class','viz-layer-svg');
 		svg = svgEnter.merge(svg)
 			.attr('width',_w)
@@ -211,6 +232,16 @@ function StationGraph(dom){
 			})
 			.on('end', () => {
 
+				console.log('force layout:end');
+				console.log(locationLookup);
+
+				//Prepare for trips animation
+				//Create new crossfilter and dimensions
+				cf = crossfilter(tripsData);
+				t0 = cf.dimension(d => d.t0);
+				t1 = cf.dimension(d => d.t1);
+				t = min(tripsData, d => d.t0);
+
 				//layout is stabilized
 				//Render trips
 				renderTrips();
@@ -231,9 +262,65 @@ function StationGraph(dom){
 
 	function renderTrips(){
 
-		ctx.clearRect(0, 0, _w, _h);
-		ctx.fillStyle = 'rgba(0,0,0,.5)';
+		//Derive trips currently in progress
+		t0.filter([-Infinity,t]);
+		t1.filter([t,Infinity]);
+		const tripsInProgress = t1.bottom(Infinity);
 
+		ctxOffScreen.clearRect(0,0,_w,_h);
+		ctxOffScreen.drawImage(canvas.node(),0,0);
+		ctx.clearRect(0,0,_w,_h);
+		ctx.save(); 
+		ctx.globalAlpha = .75;
+		ctx.drawImage(canvasOffScreen,0,0);
+		ctx.restore();
+
+		const tripPath2d = new Path2D();
+		const highlightPath2d = new Path2D();
+		const stationOutlinePath2d = new Path2D();
+
+		tripsInProgress.forEach(trip => {
+			//TODO: re-implement this based on a station at the center
+			const {station0, station1, t0, t1} = trip;
+
+			if(!locationLookup.get(station0) || !locationLookup.get(station1)){
+				return;
+			}
+
+			const {x:x0,y:y0} = locationLookup.get(station0);
+			const {x:x1,y:y1} = locationLookup.get(station1);
+			const centerX = _w/2, centerY = _h/2;
+			const pct = (t.valueOf() - t0.valueOf())/(t1.valueOf() - t0.valueOf());
+			const path2d = trip.station1 === highlightStation? highlightPath2d : tripPath2d;
+			const r = trip.station1 === highlightStation? 5 : 3;
+
+			//Interpolate current trip location
+			let _x = x0*(1-pct) + centerX*pct;
+			let _y = y0*(1-pct) + centerY*pct;
+			path2d.moveTo(_x+r, _y);
+			path2d.arc(_x, _y, r, 0, Math.PI*2);
+
+			_x = centerX*(1-pct) + x1*pct;
+			_y = centerY*(1-pct) + y1*pct;
+			path2d.moveTo(_x+r, _y);
+			path2d.arc(_x, _y, r, 0, Math.PI*2);
+
+			//Outline target station
+			const r1 = locationLookup.get(station1).r1;
+			stationOutlinePath2d.moveTo(x1+r1+3,y1);
+			stationOutlinePath2d.arc(x1,y1,r1+3,0,Math.PI*2);
+		});
+
+		ctx.fillStyle = 'rgb(255,255,0)';
+		ctx.fill(tripPath2d);
+		ctx.fillStyle = 'rgba(0,0,0,.3)';
+		ctx.fill(highlightPath2d);
+		ctx.strokeStyle = 'rgb(255,255,0)';
+		ctx.strokeWidth = '2px';
+		ctx.stroke(stationOutlinePath2d);
+
+		//Update time and request next frame
+		t = new Date(t.valueOf() + 24000);
 		requestAnimationFrame(renderTrips);
 
 	}
