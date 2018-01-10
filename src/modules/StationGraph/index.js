@@ -59,7 +59,7 @@ function StationGraph(dom){
 			.key(d => d.station1)
 			.rollup(xs => xs.length)
 			.map(tripsData);
-		stationsData = stations.map(s => {
+		stationsData = stations.map((s,i) => {
 			const [x,y] = projection([s.lng,s.lat]);
 			const departureVolume = departuresByStation.get(s.id_short)?departuresByStation.get(s.id_short):0;
 			const arrivalVolume = arrivalsByStation.get(s.id_short)?arrivalsByStation.get(s.id_short):0;
@@ -72,7 +72,8 @@ function StationGraph(dom){
 				r0,
 				r1,
 				x,
-				y
+				y,
+				arc: i%5===0?true:false
 			}
 		});
 		stationsData.forEach(s => {
@@ -223,17 +224,16 @@ function StationGraph(dom){
 						const angle = Math.atan2((y-_h/2),(x-_w/2))*180/Math.PI;
 						return `translate(${_w/2},${_h/2})rotate(${angle})`;
 					})
-					.attr('d', (d,i) => {
+					.attr('d', d => {
 						const {x,y,r0,r1} = d;
 						const l = Math.sqrt( (x-_w/2)*(x-_w/2) + (y-_h/2)*(y-_h/2) );
-						return i%5===0?ArcPath(path())({r0,r1,l}).toString():MainPath(path())({r0,r1,l}).toString();
+						return d.arc?ArcPath(path())({r0,r1,l}).toString():MainPath(path())({r0,r1,l}).toString();
 					});
 
 			})
 			.on('end', () => {
 
 				console.log('force layout:end');
-				console.log(locationLookup);
 
 				//Prepare for trips animation
 				//Create new crossfilter and dimensions
@@ -241,6 +241,14 @@ function StationGraph(dom){
 				t0 = cf.dimension(d => d.t0);
 				t1 = cf.dimension(d => d.t1);
 				t = min(tripsData, d => d.t0);
+
+				//For stations with arc path, compute offset from center
+				stationsData.forEach(s => {
+					if(!s.arc) return;
+					s.offsetFromCenter = Math.sqrt((s.x-_w/2)*(s.x-_w/2) + (s.y-_h/2)*(s.y-_h/2));
+					s.offsetAngleFromCenter = Math.atan2((s.y-_h/2),(s.x-_w/2));
+				});
+				console.log(stationsData);
 
 				//layout is stabilized
 				//Render trips
@@ -271,7 +279,7 @@ function StationGraph(dom){
 		ctxOffScreen.drawImage(canvas.node(),0,0);
 		ctx.clearRect(0,0,_w,_h);
 		ctx.save(); 
-		ctx.globalAlpha = .75;
+		ctx.globalAlpha = .85;
 		ctx.drawImage(canvasOffScreen,0,0);
 		ctx.restore();
 
@@ -287,23 +295,41 @@ function StationGraph(dom){
 				return;
 			}
 
-			const {x:x0,y:y0} = locationLookup.get(station0);
-			const {x:x1,y:y1} = locationLookup.get(station1);
+			const {x:x0,y:y0,arc:arc0} = locationLookup.get(station0);
+			const {x:x1,y:y1,arc:arc1} = locationLookup.get(station1);
 			const centerX = _w/2, centerY = _h/2;
 			const pct = (t.valueOf() - t0.valueOf())/(t1.valueOf() - t0.valueOf());
 			const path2d = trip.station1 === highlightStation? highlightPath2d : tripPath2d;
-			const r = trip.station1 === highlightStation? 5 : 3;
+			const r = trip.station1 === highlightStation? 3 : 3;
+			let _x, _y;
+			let _r, _a; //used to interpolate along arc
 
 			//Interpolate current trip location
-			let _x = x0*(1-pct) + centerX*pct;
-			let _y = y0*(1-pct) + centerY*pct;
-			path2d.moveTo(_x+r, _y);
-			path2d.arc(_x, _y, r, 0, Math.PI*2);
+			//Straight line interpolation or interpolation along a path
+			if(!arc0){
+				_x = x0*(1-pct) + centerX*pct;
+				_y = y0*(1-pct) + centerY*pct;
+				path2d.moveTo(_x+r, _y);
+				path2d.arc(_x, _y, r, 0, Math.PI*2);
+			}else{
 
-			_x = centerX*(1-pct) + x1*pct;
-			_y = centerY*(1-pct) + y1*pct;
-			path2d.moveTo(_x+r, _y);
-			path2d.arc(_x, _y, r, 0, Math.PI*2);
+			}
+
+			if(!arc1){
+				_x = centerX*(1-pct) + x1*pct;
+				_y = centerY*(1-pct) + y1*pct;
+				path2d.moveTo(_x+r, _y);
+				path2d.arc(_x, _y, r, 0, Math.PI*2);
+			}else{
+				// //Interpolate along semi-circular arc ugh
+				// _r = Math.sqrt((x1-centerX)*(x1-centerX) + (y1-centerY)*(y1-centerY));
+				// _a = Math.atan2((y1-centerY),(x1-centerX))*180/Math.PI;
+				// path2d.translate(centerX, centerY);
+				// path2d.rotate(_a);
+				// path2d.translate(_r-Math.cos(pct*Math.PI)*r, Math.sin(pct*Math.PI)*r);
+				// path2d.arc(0,0,r,0,Math.PI*2);
+				// path2d.resetTransform();
+			}
 
 			//Outline target station
 			const r1 = locationLookup.get(station1).r1;
@@ -313,14 +339,14 @@ function StationGraph(dom){
 
 		ctx.fillStyle = 'rgb(255,255,0)';
 		ctx.fill(tripPath2d);
-		ctx.fillStyle = 'rgba(0,0,0,.3)';
+		ctx.fillStyle = 'rgba(255,255,255,1)';
 		ctx.fill(highlightPath2d);
 		ctx.strokeStyle = 'rgb(255,255,0)';
-		ctx.strokeWidth = '2px';
+		ctx.lineWidth = 2;
 		ctx.stroke(stationOutlinePath2d);
 
 		//Update time and request next frame
-		t = new Date(t.valueOf() + 24000);
+		t = new Date(t.valueOf() + 18000);
 		requestAnimationFrame(renderTrips);
 
 	}
