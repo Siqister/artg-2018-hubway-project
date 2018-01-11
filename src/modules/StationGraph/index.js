@@ -151,22 +151,36 @@ function StationGraph(dom){
 			.style('left',0)
 			.call(renderStations);
 		//Gradient def
-		const gradient = svgEnter.append('defs')
+		const defs = svgEnter.append('defs');
+		const gradient1 = defs
 			.append('linearGradient')
 			.attr('id','grad1')
 			.attr('x1','0%')
 			.attr('y1','0%')
 			.attr('x2','100%')
 			.attr('y2','0%');
-		gradient.append('stop')
+		gradient1.append('stop')
 			.attr('offset','0%')
 			.attr('style','stop-color:rgba(255,255,255,0)')
-		gradient.append('stop')
+		gradient1.append('stop')
 			.attr('offset','20%')
 			.attr('style','stop-color:rgba(255,255,255,0)')
-		gradient.append('stop')
+		gradient1.append('stop')
 			.attr('offset','100%')
 			.attr('style','stop-color:rgba(255,255,255,.2)');
+		const gradient2 = defs
+			.append('linearGradient')
+			.attr('id','grad2')
+			.attr('x1','0%')
+			.attr('y1','0%')
+			.attr('x2','100%')
+			.attr('y2','0%');
+		gradient2.append('stop')
+			.attr('offset','0%')
+			.attr('style','stop-color:rgba(255,255,255,0)')
+		gradient2.append('stop')
+			.attr('offset','100%')
+			.attr('style','stop-color:rgba(0,0,200,.8)');
 
 		//Unmount button
 		let unmountButton = root
@@ -237,7 +251,7 @@ function StationGraph(dom){
 		});
 		_dispatch.on('trip:started', trip => {
 			stationLinks.filter(d => d.id_short === trip.station1)
-				.style('fill','rgba(0,0,200,.5)');
+				.style('fill','url(#grad2)');
 			stationNodes.filter(d => d.id_short === trip.station1)
 				.select('circle')
 				.style('fill', 'rgb(255,255,0)');
