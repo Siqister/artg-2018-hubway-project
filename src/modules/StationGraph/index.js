@@ -1,6 +1,7 @@
 import {nest, select, map, min, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path} from 'd3';
 import {MainPath, ArcPath} from '../TripBalanceGraph';
 const crossfilter = require('crossfilter');
+const Matrix = require('transformation-matrix-js').Matrix; //https://www.npmjs.com/package/transformation-matrix-js
 
 function StationGraph(dom){
 
@@ -73,7 +74,7 @@ function StationGraph(dom){
 				r1,
 				x,
 				y,
-				arc: i%5===0?true:false
+				arc: i%3===0?true:false
 			}
 		});
 		stationsData.forEach(s => {
@@ -248,7 +249,6 @@ function StationGraph(dom){
 					s.offsetFromCenter = Math.sqrt((s.x-_w/2)*(s.x-_w/2) + (s.y-_h/2)*(s.y-_h/2));
 					s.offsetAngleFromCenter = Math.atan2((s.y-_h/2),(s.x-_w/2));
 				});
-				console.log(stationsData);
 
 				//layout is stabilized
 				//Render trips
@@ -264,7 +264,8 @@ function StationGraph(dom){
 		_links
 			.style('fill','url(#grad1)')
 			.filter(d => d.id_short === _highlight)
-			.style('fill','#00ff80');
+			.style('fill','rgba(0,0,0,.3)');
+			//.style('fill','#00ff80');
 
 	}
 
@@ -285,24 +286,31 @@ function StationGraph(dom){
 
 		const tripPath2d = new Path2D();
 		const highlightPath2d = new Path2D();
+		const tripLinePath2d = new Path2D();
 		const stationOutlinePath2d = new Path2D();
+
+		//transformation matrix used to interpolate along semi-circular arcs
+		const _m = new Matrix();
+		ctx.beginPath();
 
 		tripsInProgress.forEach(trip => {
 			//TODO: re-implement this based on a station at the center
-			const {station0, station1, t0, t1} = trip;
+			const {station0:s0, station1:s1, t0, t1} = trip;
 
-			if(!locationLookup.get(station0) || !locationLookup.get(station1)){
+			if(!locationLookup.get(s0) || !locationLookup.get(s1)){
 				return;
 			}
 
-			const {x:x0,y:y0,arc:arc0} = locationLookup.get(station0);
-			const {x:x1,y:y1,arc:arc1} = locationLookup.get(station1);
+			const station0 = locationLookup.get(s0);
+			const station1 = locationLookup.get(s1);
+			const {x:x0,y:y0,arc:arc0} = station0;
+			const {x:x1,y:y1,arc:arc1} = station1;
+
 			const centerX = _w/2, centerY = _h/2;
 			const pct = (t.valueOf() - t0.valueOf())/(t1.valueOf() - t0.valueOf());
 			const path2d = trip.station1 === highlightStation? highlightPath2d : tripPath2d;
 			const r = trip.station1 === highlightStation? 3 : 3;
 			let _x, _y;
-			let _r, _a; //used to interpolate along arc
 
 			//Interpolate current trip location
 			//Straight line interpolation or interpolation along a path
@@ -311,39 +319,64 @@ function StationGraph(dom){
 				_y = y0*(1-pct) + centerY*pct;
 				path2d.moveTo(_x+r, _y);
 				path2d.arc(_x, _y, r, 0, Math.PI*2);
+				ctx.moveTo(x0,y0);
+				ctx.moveTo(_x,_y);
 			}else{
-
+				//No-op for now
 			}
 
 			if(!arc1){
+				//Simple straight line interpolation
 				_x = centerX*(1-pct) + x1*pct;
 				_y = centerY*(1-pct) + y1*pct;
 				path2d.moveTo(_x+r, _y);
 				path2d.arc(_x, _y, r, 0, Math.PI*2);
+				ctx.moveTo(_x,_y);
+				ctx.lineTo(x1,y1);
 			}else{
-				// //Interpolate along semi-circular arc ugh
-				// _r = Math.sqrt((x1-centerX)*(x1-centerX) + (y1-centerY)*(y1-centerY));
-				// _a = Math.atan2((y1-centerY),(x1-centerX))*180/Math.PI;
-				// path2d.translate(centerX, centerY);
-				// path2d.rotate(_a);
-				// path2d.translate(_r-Math.cos(pct*Math.PI)*r, Math.sin(pct*Math.PI)*r);
-				// path2d.arc(0,0,r,0,Math.PI*2);
-				// path2d.resetTransform();
-			}
+				//Interpolation along semi-circular arc
+				const {offsetFromCenter,offsetAngleFromCenter} = station1;
+				//xy in untransformed space
+				const tempX = offsetFromCenter/2 - Math.cos(pct*Math.PI)*offsetFromCenter/2;
+				const tempY = -Math.sin(pct*Math.PI)*offsetFromCenter/2;
+				//transformation matrix
+				_m
+					.translate(centerX, centerY)
+					.rotate(offsetAngleFromCenter);
+				//xy in transformed space
+				const _xy = _m.applyToPoint(tempX, tempY);
+				_x = _xy.x;
+				_y = _xy.y;
+				//Draw line in transformed space
+				_m.applyToContext(ctx);
+				ctx.moveTo(offsetFromCenter, 0);
+				ctx.arc(offsetFromCenter/2,0,offsetFromCenter/2,0,Math.PI*(pct-1),true);
+				ctx.moveTo(tempX, tempY);
+
+				//Reset
+				_m.reset();
+				_m.applyToContext(ctx);
+
+				path2d.moveTo(_x+r, _y);
+				path2d.arc(_x, _y, r, 0, Math.PI*2);
+			}	
 
 			//Outline target station
-			const r1 = locationLookup.get(station1).r1;
-			stationOutlinePath2d.moveTo(x1+r1+3,y1);
-			stationOutlinePath2d.arc(x1,y1,r1+3,0,Math.PI*2);
+			// const r1 = station1.r1;
+			// stationOutlinePath2d.moveTo(x1+r1+3,y1);
+			// stationOutlinePath2d.arc(x1,y1,r1+3,0,Math.PI*2);
 		});
 
+		ctx.closePath();
+		ctx.strokeStyle = 'rgba(255,255,0,.2)';
+		ctx.stroke();
 		ctx.fillStyle = 'rgb(255,255,0)';
 		ctx.fill(tripPath2d);
 		ctx.fillStyle = 'rgba(255,255,255,1)';
 		ctx.fill(highlightPath2d);
-		ctx.strokeStyle = 'rgb(255,255,0)';
-		ctx.lineWidth = 2;
-		ctx.stroke(stationOutlinePath2d);
+		// ctx.strokeStyle = 'rgb(255,255,0)';
+		// ctx.lineWidth = 2;
+		// ctx.stroke(stationOutlinePath2d);
 
 		//Update time and request next frame
 		t = new Date(t.valueOf() + 18000);
