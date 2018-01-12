@@ -16,9 +16,11 @@ function StationGraph(dom){
 
 	//Reference to internal nodes
 	let svg;
-	let canvas;
+	let canvas; //main canvas, with blurring effect
 	let canvasOffScreen;
+	let canvasLabel; //secondary canvas, for labels
 	let ctx;
+	let ctxLabel;
 	let ctxOffScreen;
 	let stationLinks;
 	let stationNodes;
@@ -115,6 +117,21 @@ function StationGraph(dom){
 			.attr('class','station-graph module');
 
 		//Build/update visualization layers
+		canvasLabel = root
+			.selectAll('.viz-layer-canvas-label')
+			.data([1]);
+		canvasLabel = canvasLabel.enter()
+			.append('canvas')
+			.attr('class','viz-layer-canvas-label')
+			.merge(canvasLabel)
+			.attr('width',_w)
+			.attr('height',_h)
+			.style('position','absolute')
+			.style('top',0)
+			.style('left',0)
+			.style('pointer-events','none');
+		ctxLabel = canvasLabel.node().getContext('2d');
+
 		canvas = root
 			.selectAll('.viz-layer-canvas')
 			.data([1]);
@@ -141,7 +158,7 @@ function StationGraph(dom){
 			.selectAll('.viz-layer-svg')
 			.data([1]);
 		const svgEnter = svg.enter()
-			.insert('svg','.viz-layer-canvas')
+			.insert('svg','.viz-layer-canvas-label')
 			.attr('class','viz-layer-svg');
 		svg = svgEnter.merge(svg)
 			.attr('width',_w)
@@ -161,10 +178,10 @@ function StationGraph(dom){
 			.attr('y2','0%');
 		gradient1.append('stop')
 			.attr('offset','0%')
-			.attr('style','stop-color:rgba(255,255,255,0)')
+			.attr('style','stop-color:rgba(255,255,255,0)');
 		gradient1.append('stop')
 			.attr('offset','20%')
-			.attr('style','stop-color:rgba(255,255,255,0)')
+			.attr('style','stop-color:rgba(255,255,255,0)');
 		gradient1.append('stop')
 			.attr('offset','100%')
 			.attr('style','stop-color:rgba(255,255,255,.2)');
@@ -177,10 +194,13 @@ function StationGraph(dom){
 			.attr('y2','0%');
 		gradient2.append('stop')
 			.attr('offset','0%')
-			.attr('style','stop-color:rgba(255,255,255,0)')
+			.attr('style','stop-color:rgba(0,0,200,0)')
+		gradient2.append('stop')
+			.attr('offset','20%')
+			.attr('style','stop-color:rgba(0,0,200,0)');
 		gradient2.append('stop')
 			.attr('offset','100%')
-			.attr('style','stop-color:rgba(0,0,200,.8)');
+			.attr('style','stop-color:rgba(0,0,200,1)');
 
 		//Unmount button
 		let unmountButton = root
@@ -334,6 +354,8 @@ function StationGraph(dom){
 		ctx.drawImage(canvasOffScreen,0,0);
 		ctx.restore();
 
+		ctxLabel.clearRect(0,0,_w,_h);
+
 		const tripPath2d = new Path2D();
 		const highlightPath2d = new Path2D();
 		const tripLinePath2d = new Path2D();
@@ -341,12 +363,16 @@ function StationGraph(dom){
 
 		//transformation matrix used to interpolate along semi-circular arcs
 		const _m = new Matrix();
+
 		ctx.beginPath();
+		ctxLabel.beginPath();
+		ctxLabel.fillStyle = 'rgba(255,255,0,.6)';
+		ctxLabel.font = '12px Miso';
 
 		tripsInProgress.forEach(trip => {
 			//TODO: re-implement this based on a station at the center
 			//Current trip and stations
-			const {station0:s0, station1:s1, t0, t1} = trip;
+			const {station0:s0, station1:s1, t0, t1, bike} = trip;
 			if(!locationLookup.get(s0) || !locationLookup.get(s1)){
 				return;
 			}
@@ -407,7 +433,18 @@ function StationGraph(dom){
 				//Reset
 				_m.reset();
 				_m.applyToContext(ctx);
+
 			}	
+
+			//If s1 is highlighted
+			if(s1 === highlightStation){
+				ctxLabel.moveTo(_x+r+5, _y);
+				ctxLabel.arc(_x, _y, r+5, 0, Math.PI*2);
+			}
+
+			//Labels
+			ctxLabel.fillStyle = 'rgba(255,255,0,.6)';
+			ctxLabel.fillText(bike, _x+5, _y+5);
 
 			//Trigger trip:started
 			if(trip.t0 > tStartTrigger){
@@ -417,6 +454,10 @@ function StationGraph(dom){
 
 		});
 
+		//Fill highlights
+		ctxLabel.closePath();
+		ctxLabel.fillStyle = 'rgba(255,255,255,.6)';
+		ctxLabel.fill();
 		//Stroking trip line
 		ctx.closePath();
 		ctx.strokeStyle = 'rgba(255,255,0,.2)';
