@@ -1,5 +1,6 @@
 import {nest, select, map, min, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path, dispatch} from 'd3';
 import {MainPath, ArcPath} from '../TripBalanceGraph';
+import TimeInput from '../TimeInput';
 const crossfilter = require('crossfilter');
 const Matrix = require('transformation-matrix-js').Matrix; //https://www.npmjs.com/package/transformation-matrix-js
 
@@ -48,6 +49,9 @@ function StationGraph(dom){
 	let tEndTrigger = new Date(4000,0,1);
 	let tStartTrigger = new Date(2000,0,1);
 	let tripToEnd; //reference to the first trip currently in progress to end
+
+	//TimeInput module
+	const timeInput = TimeInput();
 
 	//Module internal event dispatch
 	const _dispatch = dispatch('trip:ended', 'trip:started');
@@ -182,7 +186,12 @@ function StationGraph(dom){
 			.style('position','absolute')
 			.style('top','22.5px')
 			.style('right',0)
-			.style('transform','translate(0,-50%)');
+			.style('transform','translate(0,-50%)')
+			.on('click', function(){
+				select(this)
+					.datum(t)
+					.each(timeInput);
+			});
 		timeReadout.html(t.toUTCString());
 
 		//Gradient def
