@@ -264,7 +264,8 @@ html,body{
 }
 
 /* Global UI */
-.hubway-button{
+.hubway-button,
+.time-input{
 	padding:6px 8px 5px;
 	margin:0 3px;
 	border-radius:2em;
@@ -272,7 +273,8 @@ html,body{
 	color:rgba(255,255,255,.3);
 	transition:all 200ms;
 }
-.hubway-button:hover{
+.hubway-button:hover,
+.time-input:hover{
 	border:1px solid rgb(255,255,255);
 	color:white;
 }

@@ -15,6 +15,7 @@ function StationGraph(dom){
 	let locationLookup = new Map();
 
 	//Reference to internal nodes
+	let timeReadout;
 	let svg;
 	let canvas; //main canvas, with blurring effect
 	let canvasOffScreen;
@@ -43,7 +44,7 @@ function StationGraph(dom){
 	let cf; //crossfilter
 	let t0; //crossfilter dimension
 	let t1; //crossfilter dimension
-	let t; //global state for current animation time
+	let t = new Date(); //global state for current animation time
 	let tEndTrigger = new Date(4000,0,1);
 	let tStartTrigger = new Date(2000,0,1);
 	let tripToEnd; //reference to the first trip currently in progress to end
@@ -117,6 +118,7 @@ function StationGraph(dom){
 			.attr('class','station-graph module');
 
 		//Build/update visualization layers
+		//<canvas> without crossfading; for labels etc.
 		canvasLabel = root
 			.selectAll('.viz-layer-canvas-label')
 			.data([1]);
@@ -132,6 +134,7 @@ function StationGraph(dom){
 			.style('pointer-events','none');
 		ctxLabel = canvasLabel.node().getContext('2d');
 
+		//<canvas> with crossfading
 		canvas = root
 			.selectAll('.viz-layer-canvas')
 			.data([1]);
@@ -154,6 +157,7 @@ function StationGraph(dom){
 		canvasOffScreen.width = _w;
 		canvasOffScreen.height = _h;
 
+		//<svg>
 		svg = root
 			.selectAll('.viz-layer-svg')
 			.data([1]);
@@ -167,6 +171,20 @@ function StationGraph(dom){
 			.style('top',0)
 			.style('left',0)
 			.call(renderStations);
+
+		//time readout
+		timeReadout = root
+			.selectAll('.time-input')
+			.data([1]);
+		timeReadout = timeReadout.enter()
+			.append('div')
+			.attr('class','time-input')
+			.style('position','absolute')
+			.style('top','22.5px')
+			.style('right',0)
+			.style('transform','translate(0,-50%)');
+		timeReadout.html(t.toUTCString());
+
 		//Gradient def
 		const defs = svgEnter.append('defs');
 		const gradient1 = defs
@@ -470,6 +488,7 @@ function StationGraph(dom){
 		ctx.fill(highlightPath2d);
 
 		//Update time and request next frame
+		timeReadout.html(t.toUTCString());
 		t = new Date(t.valueOf() + 18000);
 		requestAnimationFrame(renderTrips);
 
