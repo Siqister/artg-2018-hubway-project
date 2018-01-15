@@ -27,6 +27,14 @@ function Model(){
 	}
 
 	exports.fetch = function(){
+		if(/.csv$/.test(_url)){
+			_fetchCsv.call(exports);
+		}else{
+			_fetchCsv.call(exports);
+		}
+	}
+
+	function _fetchCsv(){
 		_dispatch.call('fetch:start');
 
 		_dataStore = new Promise((resolve,reject) => {
@@ -45,6 +53,23 @@ function Model(){
 		});
 
 		return _dataStore
+	}
+
+	function _fetchUrl(){
+		_dispatch.call('fetch:start');
+
+		_dataStore = fetch(_url)
+			.then(res => res.json())
+			.then(res => res.map(_parse))
+			.then(res => {
+				_dispatch.call('fetch:success',null,res);
+				_dispatch.call('fetch:end');
+				return res;
+			})
+			.catch(err => {
+				_dispatch.call('fetch:error',null,Error(err));
+				_dispatch.call('fetch:end');
+			});
 	}
 
 	exports.on = function(...args){
