@@ -255,17 +255,15 @@ html,body{
 		fill-opacity:1;
 	}
 
-
-
+/* Global UI Elements*/
 
 /* Loading status */
 .loading-status path{
 	animation:rotate 2s infinite;
 }
 
-/* Global UI */
-.hubway-button,
-.time-input{
+/* Buttons */
+.hubway-button{
 	padding:6px 8px 5px;
 	margin:0 3px;
 	border-radius:2em;
@@ -273,8 +271,7 @@ html,body{
 	color:rgba(255,255,255,.3);
 	transition:all 200ms;
 }
-.hubway-button:hover,
-.time-input:hover{
+.hubway-button:hover{
 	border:1px solid rgb(255,255,255);
 	color:white;
 }
@@ -287,6 +284,14 @@ html,body{
 .hubway-button.active:hover{
 	color:rgb(0,50,255);
 }
+
+/* TimeInput */
+.time-input input{
+	background:none;
+	border:none;
+}
+
+
 
 
 

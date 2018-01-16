@@ -11,6 +11,8 @@ function TimeInput(_){
 
 	function exports(date){
 		const root = select(_ || this);
+		const dateStr = date.toISOString().split('T')[0];
+		const timeStr = date.toISOString().split('T')[1];
 
 		//Build DOM
 		root.classed('time-input',true)
@@ -21,8 +23,12 @@ function TimeInput(_){
 		dateInput = dateInput.enter()
 			.append('input')
 			.attr('class','date-input')
-			.attr('type','date')
-			.property('value', `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`);
+			.property('type','date');
+		dateInput.node().value = dateStr;
+			// .attr('defaultValue', dateStr)
+			// .on('change', function(){
+			// 	console.log(this.value);
+			// });
 	}
 
 	exports.t0 = function(_){

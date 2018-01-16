@@ -1,6 +1,5 @@
 import {nest, select, map, min, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path, dispatch} from 'd3';
 import {MainPath, ArcPath} from '../TripBalanceGraph';
-import TimeInput from '../TimeInput';
 const crossfilter = require('crossfilter');
 const Matrix = require('transformation-matrix-js').Matrix; //https://www.npmjs.com/package/transformation-matrix-js
 
@@ -42,6 +41,7 @@ function StationGraph(dom){
 	let arcPath, mainPath;
 
 	//Animation related
+	let animationId;
 	let cf; //crossfilter
 	let t0; //crossfilter dimension
 	let t1; //crossfilter dimension
@@ -49,9 +49,6 @@ function StationGraph(dom){
 	let tEndTrigger = new Date(4000,0,1);
 	let tStartTrigger = new Date(2000,0,1);
 	let tripToEnd; //reference to the first trip currently in progress to end
-
-	//TimeInput module
-	const timeInput = TimeInput();
 
 	//Module internal event dispatch
 	const _dispatch = dispatch('trip:ended', 'trip:started');
@@ -178,21 +175,16 @@ function StationGraph(dom){
 
 		//time readout
 		timeReadout = root
-			.selectAll('.time-input')
+			.selectAll('.time-readout')
 			.data([1]);
 		timeReadout = timeReadout.enter()
 			.append('div')
-			.attr('class','time-input')
+			.attr('class','time-readout')
 			.style('position','absolute')
 			.style('top','22.5px')
 			.style('right',0)
-			.style('transform','translate(0,-50%)')
-			.on('click', function(){
-				select(this)
-					.datum(t)
-					.each(timeInput);
-			});
-		timeReadout.html(t.toUTCString());
+			.style('transform','translate(0,-50%)');
+		timeReadout.html('Preparing animation...');
 
 		//Gradient def
 		const defs = svgEnter.append('defs');
@@ -239,7 +231,11 @@ function StationGraph(dom){
 			.attr('class','hubway-button unmount')
 			.merge(unmountButton)
 			.html('List view')
-			.on('click', _onUnmount);
+			.on('click', () => {
+				//Preparation before unmounting
+				if(animationId) cancelAnimationFrame(animationId);
+				_onUnmount();
+			});
 
 	}
 
@@ -499,7 +495,7 @@ function StationGraph(dom){
 		//Update time and request next frame
 		timeReadout.html(t.toUTCString());
 		t = new Date(t.valueOf() + 18000);
-		requestAnimationFrame(renderTrips);
+		animationId = requestAnimationFrame(renderTrips);
 
 	}
 
