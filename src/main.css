@@ -286,9 +286,21 @@ html,body{
 }
 
 /* TimeInput */
+.time-input{
+	padding:2px 8px 1px;
+	border-radius:2em;
+	transition:all 200ms;
+	color:rgba(255,255,255,.3);
+	background:rgba(0,0,0,.05);
+}
+.time-input:hover{
+	color:white;
+}
 .time-input input{
 	background:none;
 	border:none;
+	margin:0;
+	padding:0;
 }
 
 

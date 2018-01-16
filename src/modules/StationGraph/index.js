@@ -1,5 +1,6 @@
 import {nest, select, map, min, geoMercator, scaleSqrt, forceSimulation, forceCollide, forceRadial, path, dispatch} from 'd3';
 import {MainPath, ArcPath} from '../TripBalanceGraph';
+import TimeInput from '../TimeInput';
 const crossfilter = require('crossfilter');
 const Matrix = require('transformation-matrix-js').Matrix; //https://www.npmjs.com/package/transformation-matrix-js
 
@@ -25,6 +26,7 @@ function StationGraph(dom){
 	let ctxOffScreen;
 	let stationLinks;
 	let stationNodes;
+
 	//Projection
 	const projection = geoMercator()
 		.scale(180000)
@@ -52,6 +54,12 @@ function StationGraph(dom){
 
 	//Module internal event dispatch
 	const _dispatch = dispatch('trip:ended', 'trip:started');
+
+	//TimeInput module
+	let timeInput = TimeInput()
+		.onInput(inputTime => {
+			t = inputTime;
+		});
 
 	function exports(data, stations){
 
@@ -176,15 +184,16 @@ function StationGraph(dom){
 		//time readout
 		timeReadout = root
 			.selectAll('.time-readout')
-			.data([1]);
+			.data([t]);
 		timeReadout = timeReadout.enter()
 			.append('div')
 			.attr('class','time-readout')
 			.style('position','absolute')
 			.style('top','22.5px')
 			.style('right',0)
-			.style('transform','translate(0,-50%)');
-		timeReadout.html('Preparing animation...');
+			.style('transform','translate(0,-50%)')
+			.each(timeInput);
+		//timeReadout.html('Preparing animation...');
 
 		//Gradient def
 		const defs = svgEnter.append('defs');
@@ -493,7 +502,7 @@ function StationGraph(dom){
 		ctx.fill(highlightPath2d);
 
 		//Update time and request next frame
-		timeReadout.html(t.toUTCString());
+		timeReadout.select('.readout').html(t.toUTCString());
 		t = new Date(t.valueOf() + 18000);
 		animationId = requestAnimationFrame(renderTrips);
 
