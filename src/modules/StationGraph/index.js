@@ -8,6 +8,8 @@ function StationGraph(dom){
 
 	let _w, _h;
 	let _onUnmount = () => {};
+	let _onTooltipEnter = () => {};
+	let _onTooltipLeave = () => {};
 	let tripsData;
 	let stationsData;
 	let departuresByStation;
@@ -275,10 +277,12 @@ function StationGraph(dom){
 			.on('mouseenter',d => {
 				highlightStation = d.id_short;
 				stationLinks.call(renderLinks, highlightStation);
+				_onTooltipEnter(d);
 			})
 			.on('mouseleave',d => {
 				highlightStation = undefined;
 				stationLinks.call(renderLinks, highlightStation);
+				_onTooltipLeave();
 			});
 		stationNodes
 			.select('circle')
@@ -514,6 +518,17 @@ function StationGraph(dom){
 		return this;
 	}
 
+	exports.onTooltipEnter = function(fn){
+		if(typeof(fn) === 'undefined') return _onTooltipEnter;
+		_onTooltipEnter = fn;
+		return this;
+	}
+
+	exports.onTooltipLeave = function(fn){
+		if(typeof(fn) === 'undefined') return _onTooltipLeave;
+		_onTooltipLeave = fn;
+		return this;
+	}
 	return exports;
 
 }
