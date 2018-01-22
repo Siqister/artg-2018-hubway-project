@@ -60,12 +60,8 @@ function Tooltip(_){
 				if(selection.size()>0){
 					_map = L.map(selection.node(), {center:[datum.lat, datum.lng], zoom:13, zoomControl:false, attributionControl:false});
 
-					L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-					    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-					    maxZoom: 18,
-					    id: 'mapbox.streets',
-					    accessToken: 'pk.eyJ1Ijoic2lxaXpodTAxIiwiYSI6ImNiY2E2ZTNlNGNkNzY4YWYzY2RkMzExZjhkODgwMDc5In0.3PodCA0orjhprHrW6nsuVw'
-					}).addTo(_map);
+					L.tileLayer('https://api.mapbox.com/styles/v1/siqizhu01/cjcpktpzo49gw2rs5wx2zx9r9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2lxaXpodTAxIiwiYSI6ImNiY2E2ZTNlNGNkNzY4YWYzY2RkMzExZjhkODgwMDc5In0.3PodCA0orjhprHrW6nsuVw')
+						.addTo(_map);
 				}
 			})
 			.merge(mapContainer)
