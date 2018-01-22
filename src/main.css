@@ -245,6 +245,8 @@ html,body{
 	}
 	.station-graph svg .station-node:hover circle{
 		fill-opacity:1;
+		stroke-width:2px;
+		stroke:rgb(0,50,255);
 	}
 
 /* Global UI Elements*/
@@ -312,7 +314,6 @@ html,body{
 	height:150px;
 	background:rgb(0,50,255);
 	border-radius:0 0 3px 3px;
-	border-top:1px solid rgb(0,50,255);
 }
 .hubway-tooltip .name{
 	color:rgb(0,50,255);
