@@ -28,6 +28,17 @@ function TimeRangeSelection(dom){
 			.merge(timeInput0Node)
 			.each(timeInput0);
 
+		select(dom)
+			.selectAll('.line')
+			.data([1])
+			.enter()
+			.append('span')
+			.attr('class','line')
+			.style('flex-grow',2)
+			.style('margin','auto 5px')
+			.style('height','1px')
+			.style('background','white');
+
 		let timeInput1Node = select(dom)
 			.selectAll('.time-input-1')
 			.data([t1]);
