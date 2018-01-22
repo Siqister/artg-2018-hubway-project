@@ -90,13 +90,9 @@ function StationList(dom){
 			.data([{_stationNodeStates, _currentStationNodeState}]);
 		stationIndexNode = stationIndexNode.enter()
 			.append('div')
-			.attr('class','station-index')
-			//.style('transform','translate(0px,-100%)')
+			.attr('class','station-index banner-top')
 			.merge(stationIndexNode)
 			.each(stationIndex)
-			// .transition()
-			// .duration(1000)
-			// .style('transform','translate(0px,0%)');
 
 		let stationNodes = root
 			.selectAll('.station-node')

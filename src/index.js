@@ -8,6 +8,7 @@ import {durationGraph} from './modules/Histogram';
 import {timelineMain} from './modules/Timeline';
 import mainViz from './modules/mainViz';
 import stationInput from './modules/stationInput';
+import timeRangeSelection from './modules/timeRangeSelection';
 import {tripBalanceMain} from './modules/TripBalanceGraph';
 import {partialApplyDispatch} from './utils';
 
@@ -21,12 +22,13 @@ const globalDispatch = dispatch(
 		'async:start',
 		'async:end',
 		'async:error',
-		'resize'
+		'resize',
+		'timeRangeSelection:update'
 	);
 
 window.addEventListener('resize',() => {globalDispatch.call('resize')});
 
-//Model modules
+//Module events
 stationsModel
 	.on('fetch:start', partialApplyDispatch(globalDispatch,'async:start',null))
 	.on('fetch:end', partialApplyDispatch(globalDispatch,'async:end',null))
@@ -39,9 +41,13 @@ tripsModel
 	.on('fetch:error', partialApplyDispatch(globalDispatch,'aync:error',null))
 	.on('fetch:success', partialApplyDispatch(globalDispatch,'tripsModel:fetch:success',null));
 
+timeRangeSelection
+	.on('range:update', partialApplyDispatch(globalDispatch,'timeRangeSelection:update',null));
+
 //"Reducers"
 globalDispatch.on('stationsModel:fetch:success', data => {
 	stationInput.call(null,data);
+	timeRangeSelection.call(null);
 });
 
 globalDispatch.on('tripsModel:fetch:success', data => {
@@ -63,6 +69,10 @@ globalDispatch.on('resize', () => {
 			timelineMain.call(null,data);
 			tripBalanceMain.call(null,data.filter(d => d.station0 === '22' || d.station1 === '22'));
 		});
+});
+
+globalDispatch.on('timeRangeSelection:update', range => {
+	console.log(range);
 });
 
 //Initial data fetch
