@@ -11,6 +11,7 @@ function Model(){
 		'fetch:end'
 	);
 	let _dataStore;
+	let _cancelFetch;
 
 	function exports(){}
 
@@ -26,11 +27,11 @@ function Model(){
 		return this;
 	}
 
-	exports.fetch = function(){
+	exports.fetch = function(query = {}){
 		if(/.csv$/.test(_url)){
-			_fetchCsv.call(exports);
+			return _fetchCsv.call(exports);
 		}else{
-			_fetchCsv.call(exports);
+			return _fetchCsv.call(exports);
 		}
 	}
 
@@ -41,6 +42,10 @@ function Model(){
 			csv(_url, _parse, (err,data) => {
 				if(err){ reject(err); }
 				else{ resolve(data); }
+
+				_cancelFetch = () => {
+					reject(Error('Request is cancelled'));
+				}
 			});
 		}).then(
 			res => {
@@ -58,7 +63,12 @@ function Model(){
 	function _fetchUrl(){
 		_dispatch.call('fetch:start');
 
-		_dataStore = fetch(_url)
+		//Contruct a Promise-based cancellation trigger
+		const trigger = new Promise((resolve, reject) => {
+			_cancelFetch = () => {reject(Error('Request is cancelled'));}
+		});
+
+		_dataStore = Promise.race([fetch(_url), trigger])
 			.then(res => res.json())
 			.then(res => res.map(_parse))
 			.then(res => {
@@ -70,6 +80,13 @@ function Model(){
 				_dispatch.call('fetch:error',null,Error(err));
 				_dispatch.call('fetch:end');
 			});
+
+		return _dataStore;
+	}
+
+	exports.cancelFetch = function(){
+		if(_cancelFetch) _cancelFetch();
+		return this;
 	}
 
 	exports.on = function(...args){

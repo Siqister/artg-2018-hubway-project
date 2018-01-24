@@ -23,7 +23,8 @@ const globalDispatch = dispatch(
 		'async:end',
 		'async:error',
 		'resize',
-		'timeRangeSelection:update'
+		'timeRangeSelection:update',
+		'stationInput:update'
 	);
 
 window.addEventListener('resize',() => {globalDispatch.call('resize')});
@@ -43,6 +44,9 @@ tripsModel
 
 timeRangeSelection
 	.on('range:update', partialApplyDispatch(globalDispatch,'timeRangeSelection:update',null));
+
+stationInput
+	.on('station:update', partialApplyDispatch(globalDispatch, 'stationInput:update',null));
 
 //"Reducers"
 globalDispatch.on('stationsModel:fetch:success', data => {
@@ -73,6 +77,12 @@ globalDispatch.on('resize', () => {
 
 globalDispatch.on('timeRangeSelection:update', range => {
 	console.log(range);
+	//cancel previous request and fetch data again
+});
+
+globalDispatch.on('stationInput:update', station => {
+	console.log(station);
+	//cancel previous request and fetch data again
 });
 
 //Initial data fetch

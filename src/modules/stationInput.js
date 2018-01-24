@@ -1,4 +1,4 @@
-import {select} from 'd3';
+import {select, dispatch} from 'd3';
 import Typeahead from 'typeahead';
 
 function StationInput(_){
@@ -18,6 +18,9 @@ function StationInput(_){
 	//Internal state
 	let _currentStation;
 
+	//Internal dispatch
+	const _dispatch = dispatch('station:update');
+
 	function exports(data){
 
 		if(!_ta){
@@ -32,6 +35,7 @@ function StationInput(_){
 					//validation
 					if(_result.length>0){
 						_currentStation = _result;	
+						_dispatch.call('station:update', null, _currentStation[0]);
 					}
 					//validation success
 					redraw();
@@ -46,6 +50,11 @@ function StationInput(_){
 
 		redraw();
 
+	}
+
+	exports.on = function(...args){
+		_dispatch.on.apply(_dispatch, args);
+		return this;
 	}
 
 	function redraw(){
