@@ -81,6 +81,8 @@ globalDispatch.on('resize', () => {
 			timelineMain.call(null,data);
 			tripBalanceMain.call(null,data.filter(d => d.station0 === '22' || d.station1 === '22'));
 		});
+	Promise.all([tripsModel.toJSON(), stationsModel.toJSON()])
+		.then(([trips, stations]) => mainViz.call(null,trips,stations));
 });
 
 globalDispatch.on('timeRangeSelection:update', range => {
@@ -95,7 +97,7 @@ globalDispatch.on('timeRangeSelection:update', range => {
 globalDispatch.on('stationInput:update', station => {
 	console.log(station);
 	globalState = Object.assign({},globalState,{station:station.id_short});
-	
+
 	//cancel previous request and fetch data again
 });
 
