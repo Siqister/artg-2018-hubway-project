@@ -58,8 +58,9 @@ function TimeInput(_){
 			.attr('class','input-date')
 			.property('type','date')
 			.style('display','none')
-			.on('change',onInputChange);
-		dateInput.node().value = dateStr;
+			.attr('value',dateStr)
+			.on('change',onInputChange)
+			.merge(dateInput);
 
 		//Time input
 		timeInput = root.selectAll('.input-time')
@@ -71,7 +72,8 @@ function TimeInput(_){
 			.attr('value', timeStr)
 			.property('type','time')
 			.style('display','none')
-			.on('change',onInputChange);
+			.on('change',onInputChange)
+			.merge(timeInput);
 
 		//Mouseenter and mouseout
 		root

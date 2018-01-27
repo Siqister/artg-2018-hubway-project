@@ -10,7 +10,6 @@ function Tooltip(_){
 	function exports(datum){
 
 		const rootDom = select(_ || this);
-		console.log(datum);
 
 		//Build/update DOM
 		//info container

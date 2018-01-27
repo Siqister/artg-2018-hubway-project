@@ -27,6 +27,15 @@ const globalDispatch = dispatch(
 		'stationInput:update'
 	);
 
+//Global state
+let globalState = {
+	stationId:'22',
+	t0:new Date(2012,0,1),
+	t1:new Date(2014,0,1)
+};
+
+timeRangeSelection.call(null,[globalState.t0, globalState.t1]);
+
 window.addEventListener('resize',() => {globalDispatch.call('resize')});
 
 //Module events
@@ -51,7 +60,6 @@ stationInput
 //"Reducers"
 globalDispatch.on('stationsModel:fetch:success', data => {
 	stationInput.call(null,data);
-	timeRangeSelection.call(null);
 });
 
 globalDispatch.on('tripsModel:fetch:success', data => {
@@ -76,12 +84,18 @@ globalDispatch.on('resize', () => {
 });
 
 globalDispatch.on('timeRangeSelection:update', range => {
-	console.log(range);
+	//Update global state
+	const [t0,t1] = range;
+	globalState = Object.assign({},globalState,{t0,t1});
+	timeRangeSelection.call(null, range);
+
 	//cancel previous request and fetch data again
 });
 
 globalDispatch.on('stationInput:update', station => {
 	console.log(station);
+	globalState = Object.assign({},globalState,{station:station.id_short});
+	
 	//cancel previous request and fetch data again
 });
 

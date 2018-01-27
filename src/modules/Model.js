@@ -31,7 +31,7 @@ function Model(){
 		if(/.csv$/.test(_url)){
 			return _fetchCsv.call(exports);
 		}else{
-			return _fetchCsv.call(exports);
+			return _fetchCsv.call(exports); //TODO change this
 		}
 	}
 
