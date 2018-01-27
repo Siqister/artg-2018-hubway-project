@@ -167,25 +167,20 @@ html,body{
 /*stationList -> StationNode*/
 .station-node .anno span{
 	padding:3px 4px;
-	color:white;
-}
-.station-node .anno .stn-name{
-	color:#03afeb;
 }
 
 /*Search*/
+#station-search{
+	display:flex;
+}
 #station-search .anno{
 	height:100%;
-	float:left;
 }
 #station-search .input-container{
-/*	height:100%;
-*/	float:left;
 	height:60px;
+	flex-grow:1;
 }
 #station-search .status{
-	position:absolute;
-	right:0;
 	width:60px;
 	height:100%;
 }
@@ -219,6 +214,9 @@ html,body{
 }
 .typeahead li{
 	font-size:40px;
+}
+.typeahead .active>a{
+	color:#00ff80;
 }
 
 /* stationGraph */
@@ -339,11 +337,12 @@ html,body{
 	color:white;
 }
 .anno .stn-id{
-	background:rgb(0,0,180);
+	background:#00ff80;
+	color:white;
 }
 .anno .stn-name{
 	background:white;
-	color:rgb(0,50,255);
+	color:rgb(0,0,200);
 	text-transform: uppercase;
 }
 
